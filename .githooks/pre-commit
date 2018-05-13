@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import subprocess
 import random
+
 rng = random.SystemRandom()
 
 adjectives = '''funny fuzzy happy gritty red green blue purple white angry
@@ -46,5 +48,9 @@ version = '''#lang racket/base
   "{}")
 '''.format(random_sentence())
 
-with open('version.rkt', 'w') as f:
+VERSION_FILE_NAME = 'version.rkt'
+
+with open(VERSION_FILE_NAME, 'w') as f:
     f.write(version)
+
+subprocess.call(['git', 'add', VERSION_FILE_NAME])
