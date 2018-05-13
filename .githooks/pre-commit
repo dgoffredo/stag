@@ -1,4 +1,5 @@
 #!/usr/bin/env python
 
 import os
+# Let's see whether git picks the root or the user's cwd.
 print('Current working directory: ' + os.getcwd() + '\n')
