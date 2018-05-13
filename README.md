@@ -33,7 +33,7 @@ What
 generates two python modules: one containing python classes corresponding to
 the types defined in the schema, and another of utilities for converting
 instances of the generated classes to and from JSON-compatible compositions
-of standard python objects, (such as `dict` and `list`).
+of standard python objects, such as `dict` and `list`.
 
 How
 ---
@@ -41,7 +41,7 @@ Invoke `stag` as a command line tool:
 
     $ ./stag foosvcmsg foosvc_flat.xsd
     $ ls
-    foosvcmsg.py    foosvcmsgutil.py
+    foosvcmsg.py    foosvcmsgutil.py    foosvc_flat.xsd
 
 To the current directory or a specified directory the script writes two
 files: one containing the generated class definitions (`foosvcmsg.py`), and
@@ -50,16 +50,39 @@ functions (`foosvcmsgutil.py`).
 
 `stag` also accepts various options:
 
-<table>
-  <tr><th>Option</th><th>Description</th></tr>
-  <tr><td><pre><code>--util-module &lt;name&gt; </code></pre></td>
-      <td>Override the name of the utilities module.</td></tr>
-  <tr><td>TODO...</td>
-      <td>TODO...</td></tr>
-</table>
+| Option                      | Description                                   |
+| ------                      | -----------                                   |
+| `--output-directory <path>` | Override output directory. Default is `$PWD`. |
+| `--types-module <name>`     | Set name of module containing types.          |
+| `--util-module <name>`      | Set name of module containing utilities.      |
+| `--name-overrides <list>`   | Set generated names. See "Name Overrides."    |
 
 More
 ----
+### Repository Initialization
 Run `make init` after cloning this repository. It sets up `git` pre-commit
 hook that keeps `version.rkt` up to date. See 
 [.githooks/README.md](.githooks/README.md) for more information.
+
+### Name Overrides
+The `<list>` argument to the `--name-overrides` command line parameter is a
+scheme list having the following form:
+
+    ([old-name new-name] ...)
+
+where `old-name` is either a symbol indicating the name of a class or a list
+`(class-name attribute-name)` indicating the name of a class attribute.
+`new-name` is a symbol spelling the name of the class or attribute after the
+replacement.
+
+For example, suppose that the input XSD contains a few problematic names: a
+type `IANATimeZone` and an attribute `MAXIMUM_LENGTH` in the type `Settings`.
+In order to map `IANATimeZone` to `IanaTimeZone` and to map `MAXIMUM_LENGTH`
+to `maximum_length`, the correct override list is:
+
+    ([IANATimeZone IanaTimeZone]
+     [(Settings MAXIMUM_LENGTH) maximum_length])
+
+which can be passed on the command line as:
+
+    ./stag --override-names '([IANATimeZone IanaTimeZone] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd

@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The funny fuzzy bruised coffee kisses the slippery silly fragrant author while the lanyard insults the gritty silly fragrant plank.")
+  "The chilled blue long-winded gerbil melts the slippery tiny savory basil while the airplane fights the fantastic fried harsh friar.")

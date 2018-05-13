@@ -68,12 +68,12 @@ would print the following to standard output:
 (list 
     (choice "SomeChoice" #f 
     (list (element "foo" (basic "decimal") #f #f)
-            (element "bar" (basic "string") #f #f)))
+          (element "bar" (basic "string") #f #f)))
             
     (enumeration "Color" #f 
     (list (enumeration-value "RED" 0 #f)
-            (enumeration-value "GREEN" 1 #f) 
-            (enumeration-value "BLUE" 2 #f))))
+          (enumeration-value "GREEN" 1 #f) 
+          (enumeration-value "BLUE" 2 #f))))
 ```
 
 where the `#f` elements are placeholders for missing documentation and
