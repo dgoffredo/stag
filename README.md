@@ -1,3 +1,5 @@
+![stag](stag.png)
+
 stag
 ====
 Stupid Typed Attribute Generator
