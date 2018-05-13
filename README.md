@@ -55,3 +55,9 @@ functions (`foosvcmsgutil.py`).
   <tr><td>TODO...</td>
       <td>TODO...</td></tr>
 </table>
+
+More
+----
+Run `make init` after cloning this repository. It sets up `git` pre-commit
+hook that keeps `version.rkt` up to date. See 
+[.githooks/README.md](.githooks/README.md) for more information.

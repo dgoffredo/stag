@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The chilled sorry slippery tree observes the fragrant second soft stove while the noon aides the sharp tiny chilled lemming.")
+  "The conservative fishy blue conspiracy fries the new funny slippery friar while the cabinet rescues the gritty brisk dull chicken.")
