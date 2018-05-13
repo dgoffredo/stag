@@ -67,8 +67,8 @@ would print the following to standard output:
 ```scheme
 (list 
     (choice "SomeChoice" #f 
-    (list (element "foo" (array (basic "decimal")) #f #f)
-            (element "bar" (array (basic "string")) #f #f)))
+    (list (element "foo" (basic "decimal") #f #f)
+            (element "bar" (basic "string") #f #f)))
             
     (enumeration "Color" #f 
     (list (enumeration-value "RED" 0 #f)
