@@ -1,4 +1,5 @@
 #!/usr/bin/env python
 
 import os
-print('Current working directory: ' + os.getcwd() + '\n')
+with open('/home/david/Desktop/git-thing.txt', 'w') as f:
+    print('Current working directory: ' + os.getcwd() + '\n', file=f)
