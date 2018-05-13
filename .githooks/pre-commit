@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+'''Write a version file before each commit.
+
+This module is invoked by git before each commit. It writes a very silly
+sentence to a specific file to mark the "version" of this commit.
+'''
+
 import subprocess
 import random
 
@@ -40,7 +46,7 @@ def random_sentence():
                     ['the'] + rng.sample(adjectives, 3) +
                     rng.sample(nouns, 1)) + '.'
 
-version = '''#lang racket/base
+version_content = '''#lang racket/base
 
 (provide *stag-version*)
 
@@ -51,6 +57,6 @@ version = '''#lang racket/base
 VERSION_FILE_NAME = 'version.rkt'
 
 with open(VERSION_FILE_NAME, 'w') as f:
-    f.write(version)
+    f.write(version_content)
 
 subprocess.call(['git', 'add', VERSION_FILE_NAME])

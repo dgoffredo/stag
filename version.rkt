@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The brazen malignant conservative whale insults the childish chilled spacious asphalt while the book filibusters the white brisk moist lanyard.")
+  "The chilled sorry slippery tree observes the fragrant second soft stove while the noon aides the sharp tiny chilled lemming.")
