@@ -1,5 +1,50 @@
 #!/usr/bin/env python
 
-import os
-# Let's see whether git picks the root or the user's cwd.
-print('Current working directory: ' + os.getcwd() + '\n')
+import random
+rng = random.SystemRandom()
+
+adjectives = '''funny fuzzy happy gritty red green blue purple white angry
+fishy flaky chilled fried jaded shaded silly sorry savory second childish
+wild conservative friendly chipper malignant fragrant flagrant flippant
+harsh soft moist sharp dull rotund slim slippery slimey long-winded curious
+short-sighted big-boned haggard symbolic agnostic fantastic enthusiastic
+ecumenical clinical spiritual spacious marginal maroon discounted soaked
+sunken massive tiny excessive black bruised brazen brisk new'''.split()
+
+nouns = '''horse battery staple duck bird butt ice cabinet assembly crust
+crab chicken person programmer manager executioner asphalt gravel gavel
+basil moon noon bassoon pirate treasure rum thumb champion brisket lanyard
+coffee food frier friar table desk chair lamp pot oven stove heat galaxy
+lisp language conspiracy transmission author book fish whale napkin lemming
+hamster gerbil rat cat dog plank pen pencil sword cleaver bomb rope rant
+road constellation consternation conservation constipation constable airplane
+plant tree flower badger beaver skunk dinosaur air pear apple'''.split()
+
+verbs = '''befriends insults observes evicerates overrides smothers impresses
+filibusters intimidates aides obstructs assists flattens ignores mimics chides
+rides supports fights melts destroys electrocutes tickles kicks punches burns
+massages kisses incinerates telefrags clones educates stupefies entrances
+hypnotizes fries throws rescues resuscitates renovates pokes paints'''.split()
+
+def random_sentence():
+    return ' '.join(['The'] + rng.sample(adjectives, 3) + 
+                    rng.sample(nouns, 1) + 
+                    rng.sample(verbs, 1) +
+                    ['the'] + rng.sample(adjectives, 3) + 
+                    rng.sample(nouns, 1) +
+                    ['while', 'the'] +
+                    rng.sample(nouns, 1) + 
+                    rng.sample(verbs, 1) +
+                    ['the'] + rng.sample(adjectives, 3) +
+                    rng.sample(nouns, 1)) + '.'
+
+version = '''#lang racket/base
+
+(provide *stag-version*)
+
+(define *stag-version*
+  "{}")
+'''.format(random_sentence())
+
+with open('version.rkt', 'w') as f:
+    f.write(version)
