@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The white fuzzy jaded transmission impresses the tiny purple silly skunk while the brisket evicerates the shaded spacious fragrant pencil.")
+  "The flagrant agnostic discounted programmer overrides the white funny chipper airplane while the crab punches the long-winded blue big-boned oven.")
