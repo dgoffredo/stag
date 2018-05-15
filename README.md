@@ -38,9 +38,9 @@ How
 ---
 Invoke `stag` as a command line tool:
 
-    $ ./stag foosvcmsg foosvc_flat.xsd
+    $ ./stag foosvcmsg.xsd
     $ ls
-    foosvcmsg.py    foosvcmsgutil.py    foosvc_flat.xsd
+    foosvcmsg.py    foosvcmsgutil.py    foosvcmsg.xsd
 
 To the current directory or a specified directory the script writes two
 files: one containing the generated class definitions (`foosvcmsg.py`), and
