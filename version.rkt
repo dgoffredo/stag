@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The massive excessive white plant electrocutes the slippery funny clinical cat while the airplane assists the gritty white childish assembly.")
+  "The white fuzzy jaded transmission impresses the tiny purple silly skunk while the brisket evicerates the shaded spacious fragrant pencil.")

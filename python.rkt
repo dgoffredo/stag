@@ -10,6 +10,8 @@
   ; TODO: For testing only (but how *will* unit testing work?)
   bdlat->name-map
   bdlat->types-module
+  name-map->python-dict
+  util-module
 
   ; values describing parts of python code
   (struct-out python-module)      (struct-out python-import)
@@ -72,6 +74,10 @@
 (struct python-dict
   (items) ; list of pair (key, value)
   #:transparent) 
+
+(struct python-return
+  (expression) ; some value or invocation
+  #:transparent)
 
 (define (contains-array? bdlat-type)
   ; Return whether the specified bdlat-type contains an array; i.e. whether
@@ -351,14 +357,83 @@
     (bdlat->imports types)
     (map (lambda (type) (bdlat->class type name-map)) types)))
 
+(define (hash-value-prepend! table key value)
+  ; Prepend the specified value to the list at the specified key in the
+  ; specified table. If the key is not in the table, first add an empty list
+  ; at the key.
+  (hash-set! table key (cons value (hash-ref table key '()))))
+
+(define (name-map->python-dict name-map types-module-name)
+  ; Return a python-dict of name mappings suitable for inclusion in the util
+  ; module to be produced.
+  (let ([by-type (make-hash)])
+    ; Build up by-type :: {'type: '(("py_attr" . "bdlatAttr") ...)}.
+    (hash-for-each name-map
+      (lambda (key value)
+        (match key
+          [(list type bdlat-attribute)
+           (hash-value-prepend! 
+             by-type 
+             (hash-ref name-map type) 
+             (cons (symbol->string value) bdlat-attribute))]
+          ; Ignore the keys that are just class names.
+          [_ (void)])))
+
+    ; Build up the dict using by-type.
+    (python-dict
+      (hash-map 
+        by-type
+        (lambda (key pairs)
+          (cons
+            ; the outer dict key, e.g. messages.Type
+            (string->symbol (~a types-module-name "." key))
+            ; the outer dict's value, e.g. gencodeutil.NameMapping({...})
+            (python-invoke 
+              'gencodeutil.NameMapping 
+              (list (python-dict pairs)))))))))
+
 (define (util-module types-module-name name-map)
-  (TODO))
+  (python-module
+    ; description
+    (~a "Provide codecs for types defined in " types-module-name ".")
+    ; documentation
+    '() ; TODO
+    ; imports
+    (list (python-import (string->symbol types-module-name) '())
+          (python-import 'gencodeutil '()))
+    ; statements (body)
+    (list
+      ; def to_json ...
+      (python-def 'to_json '(obj)
+        (list (python-return
+          (python-invoke 'gencodeutil.to_json '(obj _name_mappings)))))
+      ; def from_json ...
+      (python-def 'from_json '(return_type obj)
+        (list (python-return
+          (python-invoke 
+            'gencodeutil.from_json 
+            '(return_type obj _name_mappings)))))
+      ; _name_mappings = { ...
+      (python-assignment
+        '_name_mappings                                    ; lhs
+        (name-map->python-dict name-map types-module-name) ; rhs
+        '()))))                                            ; docs
+
 
 (define (bdlat->python-modules types 
                                types-module-name
                                [description *default-types-module-description*]
                                [docs *default-types-module-docs*])
-  (TODO))
+  (let ([name-map (bdlat->name-map types)])
+    (list
+      ; the types module
+      (bdlat->types-module
+        types
+        name-map
+        description
+        docs)
+      ; the util module
+      (util-module types-module-name name-map))))
 
 (define (csv list-of-symbols indent-level indent-spaces)
   ; Return "foo, bar, baz" given '(foo bar baz). This operation is performed
@@ -380,9 +455,11 @@
        ; ... imports ...
        ;
        ; ... statements ...
-       (~a "\n" IND TRIPQ description
-         (string-join docs (~a "\n\n" IND) #:before-first "\n\n") 
-         "\n" IND TRIPQ "\n\n\n"
+       (~a "\n" IND TRIPQ description "\n"
+         (if (empty? docs)
+           ""
+           (~a "\n" (string-join docs (~a "\n\n" IND)) "\n"))
+         IND TRIPQ "\n\n\n"
          ; imports
          (string-join (map (lambda (imp)
                              (render-python imp indent-level indent-spaces))
@@ -393,7 +470,7 @@
          (string-join (map (lambda (stm)
                              (render-python stm indent-level indent-spaces)) 
                         statements)
-           "\n"))]
+           "\n\n"))]
 
       [(python-import from-module names)
        ; can be one of
@@ -435,8 +512,7 @@
            (map (lambda (stm) 
                   (render-python stm (+ indent-level 1) indent-spaces))
                 statements)
-           "")
-         "\n")]
+           ""))]
 
       ; TODO: Consider unifying annotations and assignments.
       [(python-annotation attribute type docs default)
@@ -511,6 +587,10 @@
              items)
            ", ")
           "}")]
+
+      [(python-return expression)
+       (~a IND "return "
+         (render-python expression indent-level indent-spaces))]
 
       [(? symbol? value)
        ; Symbols are here notable in that they're printed with ~a, not ~s.

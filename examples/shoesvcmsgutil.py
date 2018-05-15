@@ -3,9 +3,6 @@
 import shoesvcmsg
 import gencodeutil
 
-from enum import Enum
-from typing import Mapping, List
-
 
 def to_json(obj):
     return gencodeutil.to_json(obj, _name_mappings)
