@@ -12,20 +12,19 @@ Syndrome (OTAS). Despite decades of experience, the widespread availability
 of cognitive behavioral therapy, and even a proposed vaccine, no regimen has
 been shown effective for the treatment or prevention of OTAS.
 
-Victims of the disease exhibit broad dysfunction. They agonize over
-irrelevant details of code rendering, produce thousands of lines of
-redundant or unnecessary code, and generally waste the time and energy of
-unaffected individuals.
+Those diagnosed exhibit broad dysfunction. They agonize over irrelevant
+details of code rendering, produce thousands of lines of redundant or
+unnecessary code, and generally waste the time and energy of unaffected
+individuals.
 
 The leading theory of OTAS's pathology comes from Freud, who postulated that
 the patient's subconscious desire to control elimination might manifest as a
 preoccupation with technical rigidity and verbosity. However, no clinical
 study to date supports this theory.
 
-Alternative proposed modes of pathology typically involve small
-mind-controlling parasites or latent food allergies. Some people display
-apparent immunity to OTAS, and it is not known whether immunity is acquired
-or hereditary.
+Alternative proposed etiologies typically involve small mind-controlling
+parasites or latent food allergies. Some people display apparent immunity to
+OTAS, and it is not known whether immunity is acquired or hereditary.
 
 What
 ----
@@ -50,12 +49,14 @@ functions (`foosvcmsgutil.py`).
 
 `stag` also accepts various options:
 
-| Option                      | Description                                   |
-| ------                      | -----------                                   |
-| `--output-directory <path>` | Override output directory. Default is `$PWD`. |
-| `--types-module <name>`     | Set name of module containing types.          |
-| `--util-module <name>`      | Set name of module containing utilities.      |
-| `--name-overrides <list>`   | Set generated names. See "Name Overrides."    |
+| Option                        | Description                                 |
+| ------                        | -----------                                 |
+| `--output-directory <path>`   | output directory -- defaults to `$PWD`      |
+| `--types-module <name>`       | name of module containing types             |
+| `--util-module <name>`        | name of module containing utilities         |
+| `--xsd-namespace <ns>`        | XML namespace where XSD is defined          |
+| `--extensions-namespace <ns>` | XML namespace where extensions are defined  |
+| `--name-overrides <list>`     | generated identifiers. See "Name Overrides."|
 
 More
 ----
