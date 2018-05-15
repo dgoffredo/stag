@@ -76,5 +76,5 @@ would print the following to standard output:
           (enumeration-value "BLUE" 2 #f))))
 ```
 
-where the `#f` elements are placeholders for missing documentation and
-default values.
+where the `#f` and `#:omit` elements are placeholders for missing documentation
+and default values.

@@ -51,6 +51,7 @@ functions (`foosvcmsgutil.py`).
 
 | Option                        | Description                                 |
 | ------                        | -----------                                 |
+| `--verbose`                   | print verbose error and debug diagnostics   |
 | `--output-directory <path>`   | output directory -- defaults to `$PWD`      |
 | `--types-module <name>`       | name of module containing types             |
 | `--util-module <name>`        | name of module containing utilities         |
@@ -86,4 +87,4 @@ to `maximum_length`, the correct override list is:
 
 which can be passed on the command line as:
 
-    ./stag --override-names '([IANATimeZone IanaTimeZone] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd
+    ./stag --name-overrides '([IANATimeZone IanaTimeZone] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd

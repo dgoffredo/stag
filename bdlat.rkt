@@ -49,7 +49,7 @@
   ; this function.
   (match node-list
     ; empty list: doesn't contain documentation
-    ['() #f]
+    ['() '()]
     ; non-empty: see whether it's documentation
     [(list body)
      (sxml-match body
@@ -57,7 +57,7 @@
        [(xs:annotation (xs:documentation ,docs))
        (paragraphs docs)]
        ; not documentation
-       [,otherwise #f])]))
+       [,otherwise '()])]))
 
 (define (sxml->enumeration-value node index)
   (sxml-match node
@@ -65,7 +65,12 @@
                         (ext:id (,id index)))
                      ,maybe-docs ...)
 
-     (enumeration-value value id (sxml->docs maybe-docs))]
+     (enumeration-value 
+       value 
+       (sxml->docs maybe-docs) 
+       ; If id comes from the XML, it's a string, whereas if it comes from
+       ; index then it's a number. Make sure it's a number in both cases.
+       (if (string? id) (string->number id) id))]
 
     [,otherwise (error 
       (format "Expected enumeration but got: ~.v" node))]))
@@ -76,7 +81,7 @@
                     (type ,type)
                     (minOccurs [,minOccurs "1"])
                     (maxOccurs [,maxOccurs "1"])
-                    (default [,default #f]))
+                    (default [,default '#:omit]))
                  ,maybe-docs ...)
 
      (element name 
@@ -94,13 +99,13 @@
     [(list name)           (list "" name)]))
 
 (define (sxml->type type minOccurs maxOccurs)
-  (match-let* ([(list namespace typename)
+  (match-let* ([(list namespace type-name)
                 (split-name type)]
 
                [scalar-type ; whether user-defined or not (basic)
                 (if (equal? namespace "xs") ; TODO "xs" is not enough.
-                  (basic typename)
-                  typename)])
+                  (basic type-name)
+                  type-name)])
       ; maxOccurs and minOccurs determine whether this is an array, nullable,
       ; or neither.
       (cond [(not (equal? maxOccurs "1"))
@@ -122,7 +127,7 @@
  (match-let ([(list namespace local-name) (split-name type-name)])
    (equal? local-name "string")))
 
-(define (sxml->bdlat node [type-name #f] [docs #f])
+(define (sxml->bdlat node [type-name #f] [docs '()])
   ; Return the BDE "attribute type" representation of the type described in
   ; the specified SXML node.
   ; The XSD namespace must be aliased as "xs" and the extensions namespace, if

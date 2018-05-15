@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The marginal spiritual black brisket filibusters the big-boned sharp brisk pirate while the programmer renovates the jaded white slimey author.")
+  "The massive excessive white plant electrocutes the slippery funny clinical cat while the airplane assists the gritty white childish assembly.")
