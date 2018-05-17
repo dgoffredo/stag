@@ -4,9 +4,8 @@
 
 (define options (parse-options))
 
-(display options)
+(print options)
 (newline)
-
 ; TODO: 
 ; - Parse XSD into SXML with proper namespaces.
 ; - Extract types using bdlat.rkt.

@@ -1,4 +1,10 @@
 
+# scratch work during development
 scratch/
+
+# python related artifacts
 **/.mypy_cache/
 **/__pycache__/
+
+# output of $(make build)
+build/

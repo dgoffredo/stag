@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The fragrant excessive blue table incinerates the short-sighted white symbolic whale while the horse overrides the big-boned symbolic green champion.")
+  "The new green shaded transmission burns the short-sighted long-winded agnostic heat while the tree insults the enthusiastic haggard malignant staple.")
