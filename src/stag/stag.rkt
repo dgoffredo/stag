@@ -1,6 +1,6 @@
 #lang racket
 
-(require "options.rkt")
+(require "../options/options.rkt")
 
 (define options (parse-options))
 

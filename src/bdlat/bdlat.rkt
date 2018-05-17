@@ -13,9 +13,9 @@
   (struct-out enumeration) (struct-out enumeration-value) (struct-out array)
   (struct-out nullable)    (struct-out basic))
 
-(require sxml             ; XML as s-expressions
-         "sxml-match.rkt" ; pattern matching on SXML s-expressions
-         threading)       ; thrush combinator macros (*not* concurrency)
+(require sxml                           ; XML as s-expressions
+         "../sxml-match/sxml-match.rkt" ; pattern matching SXML s-expressions
+         threading)                     ; thrush combinator macros
 
 ; data types for composing BDE "attribute types"
 ; "Transparent" means fields are printed when an instance is printed.

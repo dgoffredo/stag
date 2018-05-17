@@ -7,22 +7,16 @@
   ; Write a python source code entity to a string.
   render-python
 
-  ; TODO: For testing only (but how *will* unit testing work?)
-  bdlat->name-map
-  bdlat->types-module
-  name-map->python-dict
-  util-module
-
   ; values describing parts of python code
   (struct-out python-module)      (struct-out python-import)
   (struct-out python-class)       (struct-out python-annotation)
   (struct-out python-assignment)  (struct-out python-def)
   (struct-out python-invoke)      (struct-out python-dict))
 
-(require (prefix-in bdlat: "bdlat.rkt") ; BDE "attribute types" from SXML
-         threading                      ; thrush combinator macros (~> ~>>)
-         srfi/1                         ; list procedures (e.g. any)
-         scribble/text/wrap)            ; (wrap-line text num-chars)
+(require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
+         threading                               ; ~> and ~>> macros
+         srfi/1                                  ; list procedures (e.g. any)
+         scribble/text/wrap)                     ; (wrap-line text num-chars)
 
 ; TODO: For use when developing only.
 (define (TODO)
@@ -44,7 +38,7 @@
   (name        ; symbol
    bases       ; list of symbols
    docs        ; list of paragraphs (strings)
-   statements) ; list of annotations and/or assignments
+   statements) ; list of annotations, assignments, and/or pass
   #:transparent) 
 
 (struct python-annotation
@@ -59,6 +53,10 @@
    rhs   ; value
    docs) ; list of paragraphs
   #:transparent) 
+
+(struct python-pass
+  () ; no fields
+  #:transparent)
 
 (struct python-def
   (name  ; symbol
@@ -151,17 +149,63 @@
     (maybe-import bdlat:sequence? '(typing NamedTuple))
     (maybe-import contains-nullable? '(typing Optional))))
 
+(define (join strings [separator ""])
+  ; string-join, but with "" as the default separator instead of " ".
+  (string-join strings separator))
+
+(define split-name
+  (let* ([clauses '("\\s+"                                       ; whitespace
+                    "\\p{P}+"                                    ; punctuation
+                    "(?<=[[:upper:]])(?=[[:upper:]][[:lower:]])" ; THISCase
+                    "(?<=[[:lower:]])(?=[[:upper:]])")]          ; thisCase
+         [pattern-string (join clauses "|")]
+         [separator-regexp (pregexp pattern-string)])
+    (lambda (name)
+    ; Divide the specified string into a list of parts, where each part was
+    ; separated from its adjacent parts by any of:
+    ; - white space
+    ; - punctuation
+    ; - an upper case to lower case transition
+    ; - a lower case to upper case transition
+    ;
+    ; So, for example:
+    ; "IANATimeZone" -> ("IANA" "Time" "Zone")
+    ; "wakka/wakka.txt" -> ("wakka" "wakka" "txt")
+    ; "this_-oneIS   contrived-true" -> ("this" "one" "IS" "contrived" "true")
+    ; "THISIsAHARDOne" -> ("THIS" "Is" "AHARD" "One")
+    ; "BSaaS" -> ("B" "Saa" "S") 
+      (regexp-split separator-regexp name))))
+
+(define (capitalize-first text)
+  ; "hello" -> "Hello"
+  ; "hello there" -> "Hello there"
+  ; "12345" -> "12345"
+  (match (string->list text)
+    [(cons first-char others)
+     (list->string (cons (char-upcase first-char) others))]
+    [_ text]))
+
 (define (bdlat-name->class-name bdlat-name)
-  ; TODO: stub
-  bdlat-name)
+  ; Python classes use CapitalizedCamelCasing.
+  (~>> bdlat-name
+    split-name 
+    (map string-downcase) 
+    (map capitalize-first) 
+    join))
 
 (define (bdlat-name->attribute-name bdlat-name)
-  ; TODO: stub
-  bdlat-name)
+  ; Python class attributes use underscore_separated_lower_casing.
+  (~>> bdlat-name
+    split-name
+    (map string-downcase) 
+    (join _ "_")))
 
 (define (bdlat-name->enumeration-value-name bdlat-name)
-  ; TODO: stub
-  bdlat-name)
+  ; Python enumeration values use UNDERSCORE_SEPARATED_UPPER_CASING.
+  (~>> bdlat-name
+    split-name 
+    (map string-upcase) 
+    (join _ "_")))
 
 (define (extend-name-map name-map bdlat-type)
   ; Fill the specified hash table with mappings between the names of
@@ -227,11 +271,10 @@
 
 (define *default-types-module-docs*
   `("This module provides typed attribute classes generated from a schema."
-    ,(string-join '("Instances of the types defined in this module are "
+    ,(join '("Instances of the types defined in this module are "
                     "immutable, and may be converted to and from "
                     "JSON-compatible objects using the similarly-named "
-                    "utilities module that is dual to this module.")
-       "")))
+                    "utilities module that is dual to this module."))))
 
 (define (capitalize str)
   (match (string->list str)
@@ -331,8 +374,13 @@
     (hash-ref name-map bdlat-name) ; class name
     (list base-class)              ; base classes (there's only one)
     type-docs
-    (map (lambda (elem) (member-transformer elem bdlat-name name-map))
-         members)))                ; statements
+    ; If the class has no members, then it must contain at least one
+    ; statement, so let it be a "pass" statement. If it has members,
+    ; then transform them into statements using member-transformer.
+    (if (empty? members)
+      (list (python-pass))
+      (map (lambda (elem) (member-transformer elem bdlat-name name-map))
+          members))))
 
 (define (bdlat->class type name-map)
   ; Return a python-class translated from the specified bdlat type. Use the
@@ -343,8 +391,14 @@
        'NamedTuple name name-map docs element->annotation elements)]
 
     [(bdlat:choice name docs elements)
-     (python-class-by-category
-       'NamedUnion name name-map docs element->annotation elements)]
+     ; Choice types derive from NamedUnion _except_ when they're empty,
+     ; in which case they have to derive from NamedTuple, because an
+     ; empty NamedUnion doesn't make any sense.
+     (let ([base-class (if (empty? elements)
+                         'NamedTuple
+                         'NamedUnion)])
+       (python-class-by-category
+         'NamedUnion name name-map docs element->annotation elements))]
 
     [(bdlat:enumeration name docs values)
      (python-class-by-category
@@ -440,11 +494,16 @@
   ; a few times within render-python.
   (~> list-of-symbols
       (map (lambda (form) (render-python form indent-level indent-spaces)) _)
-      (string-join _ ", ")))
+      (join _ ", ")))
 
 (define (render-python form [indent-level 0] [indent-spaces 4])
-  (let ([IND   (make-string (* indent-level indent-spaces) #\space)] ; indent
-        [TRIPQ "\"\"\""]) ; triple quote
+  (let* ([INDENT   (make-string (* indent-level indent-spaces) #\space)]
+         [TRIPQ "\"\"\""] ; triple quote
+         ; Recurse into this procedure, preserving auxiliary arguments.
+         [recur (lambda (form [indent-level indent-level]) 
+                  (render-python form indent-level indent-spaces))]
+         ; Recurse into this procedure with indent-level incremented.
+         [recur+1 (lambda (form) (recur form (+ indent-level 1)))])
     (match form
       [(python-module description docs imports statements)
        ; """This is the description.
@@ -455,22 +514,16 @@
        ; ... imports ...
        ;
        ; ... statements ...
-       (~a "\n" IND TRIPQ description "\n"
+       (~a "\n" INDENT TRIPQ description "\n"
          (if (empty? docs)
            ""
-           (~a "\n" (string-join docs (~a "\n\n" IND)) "\n"))
-         IND TRIPQ "\n\n\n"
+           (~a "\n" (join docs (~a "\n\n" INDENT)) "\n"))
+         INDENT TRIPQ "\n\n\n"
          ; imports
-         (string-join (map (lambda (imp)
-                             (render-python imp indent-level indent-spaces))
-                        imports)
-           "")
+         (join (map recur imports))
          "\n\n"
          ; statements (classes, functions, globals, etc.)
-         (string-join (map (lambda (stm)
-                             (render-python stm indent-level indent-spaces)) 
-                        statements)
-           "\n\n"))]
+         (join (map recur statements) "\n\n"))]
 
       [(python-import from-module names)
        ; can be one of
@@ -481,12 +534,12 @@
        ;     from something import thing1, thing2, thing3
        (cond 
          [(null? names)
-           (~a IND "import " from-module "\n")]
+           (~a INDENT "import " from-module "\n")]
          [(not (list? names))
-           (~a IND "from " from-module " import " names "\n")]
+           (~a INDENT "from " from-module " import " names "\n")]
          [else
-           (string-join (map (lambda (name) 
-                                (~a IND "from " from-module " import " name)) 
+           (join (map (lambda (name) 
+                                (~a INDENT "from " from-module " import " name)) 
                             names) 
              "\n")])]
       
@@ -495,7 +548,7 @@
        ;     """documentation blah blah
        ;     """
        ;     ...
-       (~a IND "class " name
+       (~a INDENT "class " name
          (let ([bases-text (csv bases indent-level indent-spaces)])
            (if (= (string-length bases-text) 0) 
              ""
@@ -505,16 +558,11 @@
          (if (empty? docs) 
            ""
            (let ([tab (make-string indent-spaces #\space)])
-             (~a IND tab TRIPQ (string-join docs (~a "\n\n" IND tab)) 
-               "\n" IND tab TRIPQ "\n")))
+             (~a INDENT tab TRIPQ (join docs (~a "\n\n" INDENT tab)) 
+               "\n" INDENT tab TRIPQ "\n")))
          ; statements
-         (string-join 
-           (map (lambda (stm) 
-                  (render-python stm (+ indent-level 1) indent-spaces))
-                statements)
-           ""))]
+         (join (map recur+1 statements)))]
 
-      ; TODO: Consider unifying annotations and assignments.
       [(python-annotation attribute type docs default)
        ; # docs...
        ; attribute : type = default
@@ -522,53 +570,43 @@
          ; the docs
          (if (empty? docs)
            ""
-           (let ([margin (~a IND "# ")])
-             (~a (string-join 
+           (let ([margin (~a INDENT "# ")])
+             (~a (join 
                    (map (lambda (doc) (~a margin doc)) docs)
-                   (~a "\n" margin "\n"))
+                   "\n")
                 "\n")))
          ; the attribute name
-         IND attribute
+         INDENT attribute
          ; the type name
          (if (equal? type '#:omit)
            ""
            (~a " : " 
              (if (list? type)
                ; If type is a list, then it's something like Optional["Foo"]
-               ; or Union[str, int] (though the latter won't happen). Note the
-               ; use of ~s in the map, instead of ~a, so that types that are
-               ; spelled as strings (like the names of user-defined types) are
-               ; rendered quoted. This way, those identifiers don't have to be
-               ; defined already in the python module (it's a forward type
-               ; reference).
+               ; or Union[str, int] (though the latter won't happen).
                (~a (first type) "["
-                 (string-join (map ~s (rest type)) ", ") 
+                 (join (map recur (rest type)) ", ") 
                  "]")
                ; If type is not a list, then just print it.
-               (~a type))))
+               (recur type))))
          ; the default (assigned) value
          (if (equal? default '#:omit)
            ""
-           (~a " = " (render-python default indent-level indent-spaces)))
+           (~a " = " (recur default)))
          "\n")]
 
       [(python-assignment lhs rhs docs)
-       (render-python
-         ; An assignment is an annotation whose type is omitted.
-         (python-annotation lhs '#:omit docs rhs)
-         indent-level
-         indent-spaces)]
+       ; An assignment is an annotation whose type is omitted.
+       (recur (python-annotation lhs '#:omit docs rhs))]
+
+      [(python-pass)
+       (~a INDENT "pass\n")]
 
       [(python-def name args body)
        ; def name(arg1, arg2):
        ;     body...
-       (~a IND "def " name "(" (csv args indent-level indent-spaces) "):\n"
-         (string-join 
-           (map (lambda (statement) 
-                  (render-python 
-                    statement (+ indent-level 1) indent-spaces))
-             body)
-           "")
+       (~a INDENT "def " name "(" (csv args indent-level indent-spaces) "):\n"
+         (join (map recur+1 body))
          "\n")]
 
       [(python-invoke name args)
@@ -577,20 +615,17 @@
       [(python-dict items)
        ; {key1: value1, ...}
        (~a "{"
-         (string-join
+         (join
            ; map each (key . value) pair to "key: value"
-           (map 
+           (map
              (match-lambda [(cons key value)
-               (~a (render-python key indent-level indent-spaces)
-                 ": "
-                 (render-python value indent-level indent-spaces))])
+               (~a (recur key) ": " (recur value))])
              items)
            ", ")
-          "}")]
+         "}")]
 
       [(python-return expression)
-       (~a IND "return "
-         (render-python expression indent-level indent-spaces))]
+       (~a INDENT "return " (recur expression))]
 
       [(? symbol? value)
        ; Symbols are here notable in that they're printed with ~a, not ~s.

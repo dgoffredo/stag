@@ -40,7 +40,7 @@ def to_json(obj, name_mappings):
         return {
             elem: to_json(getattr(obj, attr), name_mappings) \
             for attr, elem in name_mappings[type(obj)].py_to_schema.items() \
-            if getattr(obj, attr) is not None # TODO Breaks NamedUnion
+            if getattr(obj, attr) is not None
         }
 
 
