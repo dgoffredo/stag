@@ -6,7 +6,6 @@
 (struct options (verbose              ; #t -> print verbose diagnostics
                  types-module         ; e.g. "foosvcmsg"
                  util-module          ; e.g. "foosvcmsgutil"
-                 xsd-namespace        ; e.g. "http://www.w3.org/2001/XMLSchema"
                  extensions-namespace ; e.g. for <element>'s "id" attribute
                  name-overrides       ; e.g. ([before after] ...)
                  output-directory     ; path to directory for output files
@@ -26,7 +25,6 @@
   (define verbose (make-parameter #f))
   (define types-module (make-parameter #f))
   (define util-module  (make-parameter #f))
-  (define xsd-namespace (make-parameter "http://www.w3.org/2001/XMLSchema"))
   (define extensions-namespace 
     (make-parameter "http://bloomberg.com/schemas/bdem"))
   (define name-overrides (make-parameter '()))
@@ -44,9 +42,6 @@
       [("--util-module") UTIL-MODULE
                           "Set the name of the util module"
                           (util-module UTIL-MODULE)]
-      [("--xsd-namespace") XSD-NAMESPACE
-                           "Set XSD XML namespace"
-                           (xsd-namespace XSD-NAMESPACE)]
       [("--extensions-namespace") EXTENSIONS-NAMESPACE
                                   "Set XSD extensions XML namespace"
                                   (extensions-namespace EXTENSIONS-NAMESPACE)]
@@ -74,7 +69,6 @@
   (options (verbose)
            types-module*
            util-module*
-           (xsd-namespace)
            (extensions-namespace)
            (name-overrides)
            (output-directory)

@@ -18,10 +18,6 @@
          srfi/1                                  ; list procedures (e.g. any)
          scribble/text/wrap)                     ; (wrap-line text num-chars)
 
-; TODO: For use when developing only.
-(define (TODO)
-  (error "You've encountered something that is not yet implemented."))
-
 (struct python-module
   (description ; string
    docs        ; list of paragraphs (strings)
@@ -168,7 +164,7 @@
     ; - an upper case to lower case transition
     ; - a lower case to upper case transition
     ;
-    ; So, for example:
+    ; For example:
     ; "IANATimeZone" -> ("IANA" "Time" "Zone")
     ; "wakka/wakka.txt" -> ("wakka" "wakka" "txt")
     ; "this_-oneIS   contrived-true" -> ("this" "one" "IS" "contrived" "true")
@@ -315,7 +311,8 @@
     [("date") 'date]
     [("time") 'time]
     [("dateTime") 'datetime]
-    [("duration") 'timedelta]))
+    [("duration") 'timedelta]
+    [else (error (~a "Unsupported built-in type: " type))]))
 
 (define (bdlat->type-name type name-map)
   (match type
@@ -425,6 +422,7 @@
     (hash-for-each name-map
       (lambda (key value)
         (match key
+          ; Use the keys that refer to an attribute within a type.
           [(list type bdlat-attribute)
            (hash-value-prepend! 
              by-type 

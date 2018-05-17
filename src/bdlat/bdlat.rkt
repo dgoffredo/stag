@@ -13,7 +13,7 @@
   (struct-out enumeration) (struct-out enumeration-value) (struct-out array)
   (struct-out nullable)    (struct-out basic))
 
-(require sxml                           ; XML as s-expressions
+(require (only-in sxml sxml:xpath)      ; searching in XML s-expressions
          "../sxml-match/sxml-match.rkt" ; pattern matching SXML s-expressions
          threading)                     ; thrush combinator macros
 
@@ -152,8 +152,11 @@
          ,enums ...))
  
      ; require that base="xs:string" or "string" or similar
+     ; TODO: Won't be necessary once schema.rkt normalizes attributes.
      (guard (_:string? base))
 
+     ; TODO: Consider whether to sort the ,enums first, and whether then to
+     ;       honor ext:preserveEnumOrder (or whatever it's called).
      (enumeration type-name (sxml->docs maybe-docs)
        (map sxml->enumeration-value enums (range (length enums))))]
 
