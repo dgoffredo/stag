@@ -77,13 +77,13 @@ where `old-name` is either a symbol indicating the name of a class or a list
 replacement.
 
 For example, suppose that the input XSD contains a few problematic names: a
-type `IANATimeZone` and an attribute `MAXIMUM_LENGTH` in the type `Settings`.
-In order to map `IANATimeZone` to `IanaTimeZone` and to map `MAXIMUM_LENGTH`
+type `BSaaS` and an attribute `MAXIMUM_LENGTH` in the type `Settings`.
+In order to map `BSaaS` to `IanaTimeZone` and to map `MAXIMUM_LENGTH`
 to `maximum_length`, the correct override list is:
 
-    ([IANATimeZone IanaTimeZone]
+    ([BSaaS Bsaas]
      [(Settings MAXIMUM_LENGTH) maximum_length])
 
 which can be passed on the command line as:
 
-    ./stag --name-overrides '([IANATimeZone IanaTimeZone] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd
+    ./stag --name-overrides '([BSaaS Bsaas] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd

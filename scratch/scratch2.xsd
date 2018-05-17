@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+           xmlns:ext="http://www.xsd.com/extensions"
+           xmlns:tns="http://www.whatever.com/thing"
+           targetNamespace="http://www.whatever.com/thing">
+
+  <complexType name="SomeChoice">
+    <choice>
+    <element name="foo" type="decimal" />
+    <element name="bar" type="tns:Color" />
+    </choice>
+  </complexType>
+
+  <simpleType name="Color">
+    <restriction base="string">
+      <enumeration value="RED" ext:id="0" />
+      <enumeration value="GREEN" ext:id="1"/>
+      <enumeration value="BLUE" ext:id="2" />
+    </restriction>
+  </simpleType>
+
+</schema>

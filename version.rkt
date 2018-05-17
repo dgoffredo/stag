@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The purple massive second constipation kicks the childish excessive soaked friar while the rant rides the flagrant enthusiastic white rum.")
+  "The moist curious bruised rat kicks the short-sighted excessive agnostic staple while the treasure smothers the fuzzy slim massive author.")
