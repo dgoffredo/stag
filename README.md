@@ -65,6 +65,21 @@ Run `make init` after cloning this repository. It sets up `git` pre-commit
 hook that keeps `version.rkt` up to date. See 
 [.githooks/README.md](.githooks/README.md) for more information.
 
+### Build
+Stag requires Racket, and additionally the following Racket packages:
+- `raco pkg install sxml`
+- `raco pkg install threading-lib`
+
+Stag can be run from source by passing it to the Racket interpreter, e.g.
+
+    $ racket src/stag/stag.rkt --help
+
+To compile a self-contained distribution of stag, run `make build`. This will
+create a directory `build/$(uname)` containing the `stag` binary and the
+shared libraries it needs to run. The directory can then be deployed without
+needing to deploy Racket, provided that the relative path between the stag
+binary and its requisite libraries does not change.
+
 ### Name Overrides
 The `<list>` argument to the `--name-overrides` command line parameter is a
 scheme list having the following form:

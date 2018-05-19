@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The fishy new ecumenical book filibusters the dull slimey gritty cat while the oven chides the black curious green napkin.")
+  "The white sorry spacious air tickles the second maroon symbolic bird while the treasure flattens the savory spiritual harsh rum.")
