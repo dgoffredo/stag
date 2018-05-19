@@ -13,46 +13,48 @@
   ; namespace in the specified schema document (as parsed by the xml module).
   ; If the namespace corresponds to the document's toplevel namespace, then
   ; return the symbol '*toplevel*. If the namespace is not assigned to any
-  ; attribute in the schema, then return #f.
-  (let* ([attributes (~> schema-doc document-element element-attributes)]
-         [matching-attr 
-          (findf 
-            (match-lambda [(attribute _ _ name value) 
-              (equal? value namespace)])
-            attributes)])
-    (match matching-attr
-      ; Not found? Return #f.
-      [#f #f]
-      ; Found: return either the alias symbol or '*toplevel*.
-      [(attribute _ _ name value)
-       ; The name might be, e.g. 'xmlns:foo. Then we want '("xmlns" "foo").
+  ; namespace-related attribute in the schema, then return #f.
+  (let recur ([attributes (~> schema-doc document-element element-attributes)])
+    (match attributes
+      ; not found
+      ['() #f]
+      ; a list starting with an attribute whose value is the namespace
+      [(cons (attribute _ _ name (== namespace)) remaining)
        (match (string-split (symbol->string name) ":")
-         ; There's no alias; the attribute just sets the schema's namespace.
+         ; no alias -- the attribute sets the schema's toplevel namespace
          [(list "xmlns")
-          '*toplevel*]
-         [(list "xmlns" alias)
+           '*toplevel*]
          ; There is an alias. Return it.
-         (string->symbol alias)])])))
-       
+         [(list "xmlns" alias)
+          (string->symbol alias)]
+         ; Attribute is not namespace-related. Keep looking.
+         [_ (recur remaining)])]
+      ; Different namespace. Keep looking. 
+      [_ (recur (rest attributes))])))
+
 (define (xsd->sxml xsd-path extensions-namespace)
-  ; Parse the XSD file at the specified path, and return an SXML
-  ; representation of the schema where the W3 XSD namespace is aliased as 'xs,
-  ; the specified extensions namespace is aliased as 'ext, and any values for
-  ; "base" or "type" attributes referring to types defined in the W3 XSD
-  ; namespace have has "xs:" prepended to them as necessary. It is assumed
-  ; that the schema will not refer to types defined in the extensions
-  ; namespace, so that case is not handled.
-  (let* ([doc (read-xml (open-input-file xsd-path))]
+  (xsd->sxml* 
+    (lambda () (open-input-file xsd-path)) 
+    extensions-namespace))
+
+(define (xsd->sxml* get-input-port extensions-namespace)
+  ; Parse the XSD document read from the result of invoking the specified
+  ; get-input-port procedure, and return an SXML representation of the schema
+  ; where the W3 XSD namespace is aliased as 'xs, the specified extensions
+  ; namespace is aliased as 'ext, and any values for "base" or "type"
+  ; attributes referring to types defined in the W3 XSD namespace have has
+  ; "xs:" prepended to them as necessary. It is assumed that the schema will
+  ; not refer to types defined in the extensions namespace, so that case is
+  ; not handled.
+  (let* ([doc (read-xml (get-input-port))]
          [xsd-alias (alias-of *xsd-namespace* doc)]
          [schema (ssax:xml->sxml 
-                   (open-input-file xsd-path)
+                   (get-input-port)
                    `((xs . ,*xsd-namespace*)
                      (ext . ,extensions-namespace)))])
     (match xsd-alias
       [#f
-       (error (~a "The schema " 
-                xsd-path 
-                " does not mention the required namespace "
+       (error (~a "The given schema does not mention the required namespace "
                 *xsd-namespace*))]
 
       ; If the W3 XSD namespace is already aliased as 'xs, then there's

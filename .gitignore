@@ -3,5 +3,5 @@
 **/.mypy_cache/
 **/__pycache__/
 
-# output of $(make build)
+# output of make build
 build/
