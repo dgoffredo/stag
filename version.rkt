@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The bruised purple angry constellation impresses the wild harsh jaded whale while the horse clones the fried purple blue table.")
+  "The fishy new ecumenical book filibusters the dull slimey gritty cat while the oven chides the black curious green napkin.")

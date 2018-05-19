@@ -471,12 +471,38 @@
         (name-map->python-dict name-map types-module-name) ; rhs
         '()))))                                            ; docs
 
+(define (merge-overrides! name-map overrides)
+  ; Apply overrides to name-map and return name-map modified in place. The
+  ; structure of overrides is a little different from that of name-map, so
+  ; convert each key/value pair. name-map looks like:
+  ;
+  ;     #hash(("MyClass" . MyClass)
+  ;           (("MyClass" "someField") . 'some_field)
+  ;           ...)
+  ;
+  ; while overrides looks like:
+  ;
+  ;     '((MyClass NewName)
+  ;       ((MyClass sOmEField) some_field))
+  (for-each
+    (match-lambda [(list key value)
+      (match key
+        ; Note how ~a is used as a short alternative to symbol->string.
+        [(? symbol? klass)
+         (dict-set! name-map (~a klass) value)]
+        [(list (? symbol? klass) (? symbol? attr))
+         (dict-set! name-map (list (~a klass) (~a attr)) value)])])
+    overrides)
 
-(define (bdlat->python-modules types 
-                               types-module-name
-                               [description *default-types-module-description*]
-                               [docs *default-types-module-docs*])
-  (let ([name-map (bdlat->name-map types)])
+  name-map)
+
+(define (bdlat->python-modules 
+          types 
+          types-module-name
+          #:overrides [overrides '()]
+          #:description [description *default-types-module-description*]
+          #:docs [docs *default-types-module-docs*])
+  (let ([name-map (~> types bdlat->name-map (merge-overrides! overrides))])
     (list
       ; the types module
       (bdlat->types-module
@@ -516,7 +542,7 @@
          (if (empty? docs)
            ""
            (~a "\n" (join docs (~a "\n\n" INDENT)) "\n"))
-         INDENT TRIPQ "\n\n\n"
+         INDENT TRIPQ "\n"
          ; imports
          (join (map recur imports))
          "\n\n"

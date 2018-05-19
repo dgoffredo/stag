@@ -1,10 +1,10 @@
 #lang racket
 
 (provide
-  ; function that converts an SXML s-expression into one of the types below
+  ; procedure that converts an SXML s-expression into one of the types below
   sxml->bdlat
 
-  ; function that finds all types defined in an SXML s-expression and returns
+  ; procedure that finds all types defined in an SXML s-expression and returns
   ; a list of the resulting objects.
   sxml->types
 
@@ -171,10 +171,10 @@
          [find-matching (sxml:xpath query ns-aliases)])
     (find-matching doc)))
 
-(define (sxml->types doc)
+(define (sxml->types schema)
   ; Return a list of all type definitions extractable from the specified SXML.
   ; The XSD namespace must be aliased as "xs" and the extensions namespace, if
   ; applicable, must be aliased as "ext".
   (~>> '("complexType" "simpleType")
-       (append-map (lambda (name) (find-all-xs name doc)))
+       (append-map (lambda (name) (find-all-xs name schema)))
        (map sxml->bdlat)))
