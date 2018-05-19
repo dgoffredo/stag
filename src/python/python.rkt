@@ -272,13 +272,6 @@
                     "JSON-compatible objects using the similarly-named "
                     "utilities module that is dual to this module."))))
 
-(define (capitalize str)
-  (match (string->list str)
-    [(cons first-letter the-rest) 
-     (list->string (cons (char-upcase first-letter) the-rest))]
-    [_
-     str]))
-
 (define (bdlat->default default py-type)
   (if (equal? default '#:omit)
     ; No default was specified. Apply type-specific policies.
@@ -292,8 +285,8 @@
     (match py-type
       ['str                   default] ; keep as a string
       [(list 'Optional 'str)  default] ; keep as a string
-      ['bool                  (~> default capitalize string->symbol)]
-      [(list 'Optional 'bool) (~> default capitalize string->symbol)]
+      ['bool                  (~> default capitalize-first string->symbol)]
+      [(list 'Optional 'bool) (~> default capitalize-first string->symbol)]
       [_                      (string->symbol default)])))
 
 (define (bdlat->built-in type)

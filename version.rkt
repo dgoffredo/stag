@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The white sorry spacious air tickles the second maroon symbolic bird while the treasure flattens the savory spiritual harsh rum.")
+  "The conservative fuzzy malignant coffee destroys the curious childish short-sighted flower while the lisp smothers the rotund funny black assembly.")
