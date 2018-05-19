@@ -80,6 +80,12 @@ shared libraries it needs to run. The directory can then be deployed without
 needing to deploy Racket, provided that the relative path between the stag
 binary and its requisite libraries does not change.
 
+### Test
+Run `make test` to run all of the `test.rkt` modules recursively under `src/`.
+You can run a test individually using `raco test`, e.g.
+
+    raco test src/xsd-util/test.rkt
+
 ### Name Overrides
 The `<list>` argument to the `--name-overrides` command line parameter is a
 scheme list having the following form:
