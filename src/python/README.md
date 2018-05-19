@@ -2,7 +2,7 @@ python
 ======
 This module provides data structures representing Python code abstract syntax tree (AST) elements and procedures for producing python code from bdlat types.
 
-For example, this module can be used to tranform the following list of bdlat types:
+For example, this module can be used to transform the following list of bdlat types:
 
 ```scheme
 (list 
