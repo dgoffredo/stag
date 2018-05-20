@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The sunken wild discounted friar smothers the new tiny flagrant lemming while the gravel chides the soft chilled gritty plant.")
+  "The flippant second slim gavel burns the maroon new fried gravel while the road hypnotizes the wild spiritual bruised book.")

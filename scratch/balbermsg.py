@@ -25,7 +25,7 @@ class BerDecoderOptions(NamedTuple):
     max_sequence_size : Optional[int] = 8388608
 
 
-class BoobOptions(NamedTuple):
+class BerEncoderOptions(NamedTuple):
     """BER encoding options
     """
     # trace (verbosity) level
