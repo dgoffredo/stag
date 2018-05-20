@@ -1,10 +1,10 @@
 #lang racket
 
-(require rackunit
-         rackunit/text-ui
-         xml
-         sxml/sxpath
-         "private.rkt")
+(require rackunit         ; test-suite, test-case, check-..., etc.
+         rackunit/text-ui ; run-tests
+         xml              ; namespace-oblivious XML parsing
+         sxml/sxpath      ; search SXML trees
+         "private.rkt")   ; the module under test
 
 (define (join-lines . lines)
     (string-join lines "\n"))

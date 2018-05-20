@@ -35,23 +35,22 @@ were converted into the following SXML:
 ```scheme
 (*TOP*
     (@
-    (*NAMESPACES*
-    (xs "http://www.w3.org/2001/XMLSchema")
-    (ext "http://www.xsd.com/extensions")))
-    (*PI* xml "version=\"1.0\" encoding=\"UTF-8\"")
+      (*NAMESPACES*
+        (xs "http://www.w3.org/2001/XMLSchema")
+        (ext "http://www.xsd.com/extensions")))
+      (*PI* xml "version=\"1.0\" encoding=\"UTF-8\"")
     (xs:schema
-    (xs:complexType
-    (@ (name "SomeChoice"))
-    (xs:choice
-        (xs:element (@ (type "xs:decimal") (name "foo")))
-        (xs:element (@ (type "xs:string") (name "bar")))))
-    (xs:simpleType
-    (@ (name "Color"))
-    (xs:restriction
-        (@ (base "xs:string"))
-        (xs:enumeration (@ (ext:id "0") (value "RED")))
-        (xs:enumeration (@ (ext:id "1") (value "GREEN")))
-        (xs:enumeration (@ (ext:id "2") (value "BLUE")))))))
+
+      (xs:complexType (@ (name "SomeChoice"))
+        (xs:choice
+          (xs:element (@ (type "xs:decimal") (name "foo")))
+          (xs:element (@ (type "xs:string") (name "bar")))))
+
+      (xs:simpleType (@ (name "Color"))
+        (xs:restriction (@ (base "xs:string"))
+          (xs:enumeration (@ (ext:id "0") (value "RED")))
+          (xs:enumeration (@ (ext:id "1") (value "GREEN")))
+          (xs:enumeration (@ (ext:id "2") (value "BLUE")))))))
 ```
 
 Then the following program (where `doc` is the SXML above):
