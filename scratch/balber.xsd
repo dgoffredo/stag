@@ -120,7 +120,7 @@
         </xs:annotation>
       </xs:element>
 
-      <xs:element name='color' type='Color' />
+      <xs:element name='color' type='Color' default='crazy-WACKYColor' />
 
       <xs:element name='thing' type='SomeChoice' />
 

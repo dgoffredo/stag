@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The flippant second slim gavel burns the maroon new fried gravel while the road hypnotizes the wild spiritual bruised book.")
+  "The silly second malignant pirate telefrags the red ecumenical purple air while the crab rides the big-boned silly enthusiastic gavel.")
