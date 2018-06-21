@@ -293,19 +293,23 @@
        (~> default capitalize-first string->symbol)]
       [(list 'typing.Optional 'bool) 
        (~> default capitalize-first string->symbol)]
-      [(? in-name-map? 
-      ; Otherwise, this is either an enumeration whose default value we have
-      ; to translate using name-map, or it's some other type whose default we
-      ; can symbolify it so it ends up printing literally (like an integer).
-      [_ ; TODO: This is all wrong.
-       (let ([enum-name (enumeration-name bdlat-type)])
-         (if enum-name
-           ; It's an enum, so look up the default's corresponding name.
-           (string->symbol 
-             (~a py-type "." 
-               (hash-ref name-map (list enum-name default))))
-           ; It's not an enum, so symbolify it, e.g. "34.5" -> '|34.5|
-           (string->symbol default)))])))
+      ; There are two remaining cases. Either py-type is an enum, and so we
+      ; need to look up the attribute name corresponding to the default value,
+      ; or it's not an enum (e.g. an int), in which case we can just turn the
+      ; default into a symbol. We assume that the type is an enum if the
+      ; bdlat-type is a key in the name-map. Default values for other types
+      ; of user-defined types don't make sense, so it's a reasonable
+      ; assumption. Also, an array cannot have a user-specified default.
+      [_
+       (let ([mapped-type? (lambda (type) 
+                             (and (string? type) 
+                                  (hash-has-key? name-map type)))])
+         (match bdlat-type
+           [(or (bdlat:nullable (? mapped-type? enum-type))
+                (? mapped-type? enum-type))
+            (string->symbol
+              (~a py-type "." (hash-ref name-map (list enum-type default))))]
+           [_ (string->symbol default)]))])))
 
 (define (bdlat->built-in type)
   ; Note that bdlat->imports also contains information about which bdlat basic
@@ -391,8 +395,10 @@
              ,(python-def '__init__
                 ; __init__ args: self, *, and the annotations (lucky reuse)
                 ; except without the documentation (to spare the newlines).
-                `(self * ,@(map (match-lambda [(python-annotation attr type docs default)
-                                               (python-annotation attr type '() default)])
+                `(self * ,@(map 
+                              (match-lambda 
+                                [(python-annotation attr type docs default)
+                                 (python-annotation attr type '() default)])
                               annotations))
                 'None ; return type
                 ; __init__ body: forward all args to the base class

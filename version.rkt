@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The silly second malignant pirate telefrags the red ecumenical purple air while the crab rides the big-boned silly enthusiastic gavel.")
+  "The fragrant jaded chipper battery rescues the dull black conservative ice while the lemming incinerates the sorry happy funny duck.")

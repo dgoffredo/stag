@@ -24,10 +24,10 @@ class BerDecoderOptions(gencodeutil.Sequence):
 
     def __init__(self,
                  *,
-                 max_depth: typing.Optional[int] = 32,
-                 skip_unknown_elements: typing.Optional[bool] = True,
-                 trace_level: typing.Optional[int] = 0,
-                 max_sequence_size: typing.Optional[int] = 8388608) -> None:
+                 max_depth: typing.Optional[int]=32,
+                 skip_unknown_elements: typing.Optional[bool]=True,
+                 trace_level: typing.Optional[int]=0,
+                 max_sequence_size: typing.Optional[int]=8388608) -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 
@@ -45,19 +45,18 @@ class BerEncoderOptions(gencodeutil.Sequence):
     encode_date_and_time_types_as_binary: bool = False
     # This option controls the number of decimal places used for seconds when encoding 'Datetime' and 'DatetimeTz'.
     datetime_fractional_second_precision: typing.Optional[int] = 3
-    color: "Color" = crazy - WACKYColor
+    color: "Color" = Color.CRAZY_WACKY_COLOR
     thing: "SomeChoice"
 
-    def __init__(
-            self,
-            *,
-            trace_level: typing.Optional[int] = 0,
-            bde_version_conformance: int = 10500,
-            encode_empty_arrays: bool = True,
-            encode_date_and_time_types_as_binary: bool = False,
-            datetime_fractional_second_precision: typing.Optional[int] = 3,
-            color: "Color" = crazy - WACKYColor,
-            thing: "SomeChoice") -> None:
+    def __init__(self,
+                 *,
+                 trace_level: typing.Optional[int]=0,
+                 bde_version_conformance: int=10500,
+                 encode_empty_arrays: bool=True,
+                 encode_date_and_time_types_as_binary: bool=False,
+                 datetime_fractional_second_precision: typing.Optional[int]=3,
+                 color: "Color"=Color.CRAZY_WACKY_COLOR,
+                 thing: "SomeChoice") -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 
