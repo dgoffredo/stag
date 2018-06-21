@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The flippant second slim gavel burns the maroon new fried gravel while the road hypnotizes the wild spiritual bruised book.")
+  "The soft big-boned fishy cleaver melts the flippant moist slippery battery while the constable befriends the white brisk funny cat.")
