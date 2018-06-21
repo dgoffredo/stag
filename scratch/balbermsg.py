@@ -10,6 +10,13 @@ import gencodeutil
 import typing
 
 
+class Color(enum.Enum):
+    RED = 0
+    GREEN = 1
+    BLUE = 2
+    CRAZY_WACKY_COLOR = 3
+
+
 class BerDecoderOptions(gencodeutil.Sequence):
     """BER decoding options
     """
@@ -66,10 +73,3 @@ class SomeChoice(gencodeutil.Choice):
 
     def __init__(self, **kwarg: typing.Union[float, datetime]) -> None:
         gencodeutil.Choice.__init__(self, **kwarg)
-
-
-class Color(enum.Enum):
-    RED = 0
-    GREEN = 1
-    BLUE = 2
-    CRAZY_WACKY_COLOR = 3

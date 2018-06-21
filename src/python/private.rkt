@@ -448,7 +448,17 @@
     description
     docs
     (bdlat->imports types)
-    (map (lambda (type) (bdlat->class type name-map)) types)))
+    ; The body of the module is a list of class definitions derived from types.
+    (map 
+      (lambda (type) (bdlat->class type name-map))
+      ; sort the types: enum < non-enum 
+      (sort 
+        types 
+        (match-lambda* 
+          [(list (struct bdlat:enumeration _)
+                 (not (struct bdlat:enumeration _)))
+            #t]
+          [_ #f])))))
 
 (define (hash-value-prepend! table key value)
   ; Prepend the specified value to the list at the specified key in the
