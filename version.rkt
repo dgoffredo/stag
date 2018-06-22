@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The soft wild purple book burns the sharp purple dull stove while the pirate burns the sharp silly shaded executioner.")
+  "The green dull slimey cleaver tickles the friendly flagrant fried stove while the asphalt flattens the fantastic dull wild battery.")

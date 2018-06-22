@@ -14,7 +14,7 @@ run_checked() {
 }
 
 # Deduce where the stag root is based on where this script is assumed to be.
-REPO=$(dirname $BASH_SOURCE)/../
+REPO=$(readlink -f $(dirname $BASH_SOURCE)/../)
 
 # Go into the scratch/ directory and run stag on the schema. 
 run_checked cd $REPO/scratch
@@ -24,10 +24,14 @@ run_checked racket $REPO/src/stag/stag.rkt balber.xsd
 FILES="balbermsg.py balbermsgutil.py"
 
 # Format the python code in place.
-run_checked yapf -i $FILES
+for module in $FILES; do
+    run_checked yapf -i $module
+done
 
 # Run python's type checker on the generated code.
-run_checked mypy --strict $FILES
+for module in $FILES; do
+    run_checked mypy --strict $module
+done
 
 # Run the generated modules in a python interpreter.
 for module in $FILES; do

@@ -1,4 +1,5 @@
 """Provide codecs for types defined in balbermsg.
+
 """
 import balbermsg
 import gencodeutil

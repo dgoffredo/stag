@@ -2,30 +2,77 @@
 
 (provide render-python)
 
-(require "types.rkt" ; python AST structs (what we're rendering)
-         threading)  ; ~> and ~>> macros
+(require "types.rkt"         ; python AST structs (what we're rendering)
+         threading           ; ~> and ~>> macros
+         scribble/text/wrap) ; (wrap-line text num-chars)
 
 (define (csv list-of-symbols indent-level indent-spaces)
   ; Return "foo, bar, baz" given '(foo bar baz). This operation is performed
   ; a few times within render-python. If list-of-symbols is not a list, then
-  ; just render it alone.
+  ; just render it alone. "csv" stands for "comma separated values."
   (if (list? list-of-symbols)
-    (~> list-of-symbols
-        (map (lambda (form) (render-python form indent-level indent-spaces)) _)
-        (string-join _ ", "))
+    (~>> list-of-symbols
+         (map (lambda (form) (render-python form indent-level indent-spaces)))
+         (string-join _ ", "))
     ; otherwise
     (render-python list-of-symbols indent-level indent-spaces)))
+
+(define (interpose sep lst)
+  ; Return a list containing the elements of the specified list, but with the
+  ; specified separator between each element, e.g.
+  ;     
+  ;     (interpose '(1 2 3) "hello")
+  ;
+  ; returns
+  ;
+  ;     '(1 "hello" 2 "hello" 3)
+  (match lst
+    ; empty list or list of one element -> that list
+    [(or '() (list _)) lst]
+    ; list of two or more elements -> (list head separator ...)
+    [(cons head tail)  (cons head (cons sep (interpose sep tail)))]))
+
+(define (format-docs docs #:prefix [prefix ""] #:width [width 79])
+  ; Return a string containing the specified list of paragraphs wrapped to
+  ; lines each with the specified prefix, where each line (including the
+  ; prefix) does not exceed the specified length, unless the line is a single
+  ; word whose length exceeds the width. Additionally, between each paragraph
+  ; is an "empty" line containing only the prefix, and lines are stipped of
+  ; trailing white space. The length of the prefix must be less than the width.
+  ; For example,
+  ;
+  ;     (format-docs '("oh hello there documentation" "how are you?" "good")
+  ;                  #:prefix "#  "
+  ;                  #:width 11)
+  ;
+  ; would produce a string containing:
+  ;
+  ;     #  oh hello
+  ;     #  there
+  ;     #  documentation
+  ;     #
+  ;     #  how are
+  ;     #  you?
+  ;     #
+  ;     #  good
+  (~>> docs
+       (map (lambda (line) (wrap-line line (- width (string-length prefix)))))
+       (interpose "")
+       flatten
+       (map (lambda (line) (string-append prefix line)))
+       (map (lambda (line) (string-trim line #:left? #f)))
+       (string-join _ "\n")))
 
 (define (render-python form [indent-level 0] [indent-spaces 4])
   ; Return a string containing the python code corresponding to the specified
   ; form, which must be some composition of python-* structs, strings,
   ; symbols, etc. Prefix each line with the specified level of indentation,
   ; where each level has the specified number of space characters.
-  (let* ([INDENT   (make-string (* indent-level indent-spaces) #\space)]
-         [TRIPQ "\"\"\""] ; triple quote
+  (let* ([INDENT  (make-string (* indent-level indent-spaces) #\space)]
+         [TRIPQ   "\"\"\""] ; triple quote
          ; Recurse into this procedure, preserving auxiliary arguments.
-         [recur (lambda (form [indent-level indent-level])
-                  (render-python form indent-level indent-spaces))]
+         [recur   (lambda (form [indent-level indent-level])
+                    (render-python form indent-level indent-spaces))]
          ; Recurse into this procedure with indent-level incremented.
          [recur+1 (lambda (form) (recur form (+ indent-level 1)))])
     (match form
@@ -38,11 +85,14 @@
        ; ... imports ...
        ;
        ; ... statements ...
-       (~a "\n" INDENT TRIPQ description "\n"
+
+       (~a "\n" INDENT TRIPQ description "\n" ; description
+         ; documentation
          (if (empty? docs)
            ""
-           (~a "\n" (string-join docs (~a "\n\n" INDENT)) "\n"))
-         INDENT TRIPQ "\n"
+           (~a "\n" 
+               (format-docs docs #:prefix INDENT)))
+         "\n" INDENT TRIPQ "\n"
          ; imports
          (string-join (map recur imports) "")
          "\n\n"
@@ -66,13 +116,14 @@
            (string-join 
              (map
                (lambda (name)
-                         (~a INDENT "from " from-module " import " name))
+                 (~a INDENT "from " from-module " import " name))
                names)
              "\n")])]
 
       [(python-class name bases docs statements)
        ; class Name(Base1, Base2):
        ;     """documentation blah blah
+       ;     more documentation of here blah blah...
        ;     """
        ;     ...
        (~a INDENT "class " name
@@ -84,9 +135,11 @@
          ; documentation
          (if (empty? docs)
            ""
-           (let ([tab (make-string indent-spaces #\space)])
-             (~a INDENT tab TRIPQ (string-join docs (~a "\n\n" INDENT tab))
-               "\n" INDENT tab TRIPQ "\n")))
+           (let* ([margin-length (* (+ indent-level 1) indent-spaces)]
+                  [margin        (make-string margin-length #\space)]
+                  ; Prepend a triple quote to the first paragraph.
+                  [docs          (cons (~a TRIPQ (first docs)) (rest docs))])
+             (~a (format-docs docs #:prefix margin) "\n" margin TRIPQ "\n")))
          ; statements
          (string-join (map recur+1 statements) "\n"))]
 
@@ -98,10 +151,7 @@
          (if (empty? docs)
            ""
            (let ([margin (~a INDENT "# ")])
-             (~a (string-join
-                   (map (lambda (doc) (~a margin doc)) docs)
-                   "\n")
-                "\n")))
+             (~a (format-docs docs #:prefix margin) "\n")))
          ; the attribute name
          INDENT attribute
          ; the type name

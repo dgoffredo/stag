@@ -6,8 +6,7 @@
          "types.rkt"                             ; python AST structs
          "name-map.rkt"                          ; schema names -> python names
          threading                               ; ~> and ~>> macros
-         srfi/1                                  ; list procedures (e.g. any)
-         scribble/text/wrap)                     ; (wrap-line text num-chars)
+         srfi/1)                                 ; list procedures (e.g. any)
 
 (define (contains-array? bdlat-type)
   ; Return whether the specified bdlat-type contains an array; i.e. whether
@@ -106,7 +105,10 @@
       [(list 'typing.List _)     '|[]|]    ; lists always default to empty
       [(list 'typing.Optional _) 'None]    ; optionals always default to None
       [_                         default]) ; otherwise just keep '#:omit
-    ; TODO: Explain the next section a bit better.
+    ; A default was specified. Leave strings alone, since they need to remain
+    ; strings in order to be quoted in render-python. Capitalize booleans since
+    ; that's how they are in python. Finally there are the "enum" and "other"
+    ; cases explained more below.
     (match py-type
       ['str                          default] ; keep as a string
       [(list 'typing.Optional 'str)  default] ; keep as a string
@@ -282,7 +284,7 @@
     ; description
     (~a "Provide codecs for types defined in " types-module-name ".")
     ; documentation
-    '() ; TODO
+    '() ; TODO: usage examples
     ; imports
     (list (python-import (string->symbol types-module-name) '())
           (python-import 'gencodeutil '())

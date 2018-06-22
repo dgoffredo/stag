@@ -136,9 +136,6 @@
        (xs:restriction (@ (base "xs:string"))
          ,enums ...))
 
-     ; TODO: Consider whether to sort the ,enums first, and whether then to
-     ;       honor ext:preserveEnumOrder (or whatever it's called). Make sure
-     ;       that ext:id still works, though.
      (enumeration type-name (sxml->docs maybe-docs)
        (map sxml->enumeration-value enums (range (length enums))))]
 
