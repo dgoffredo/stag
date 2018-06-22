@@ -13,4 +13,6 @@
   (struct-out python-assignment)  (struct-out python-def)
   (struct-out python-invoke)      (struct-out python-dict))
 
-(require "private.rkt")
+(require "types.rkt"   ; the structs
+         "convert.rkt" ; bdlat->python-modules
+         "render.rkt") ; render-python

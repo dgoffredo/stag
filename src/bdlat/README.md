@@ -1,9 +1,10 @@
 bdlat
 =====
 This module defines data types used to represent BDE "attribute types,"
-which are defined in the "bdlat" package of the BDE C++ libraries, as well
-as procedures that convert SXML nodes parsed from an XSD document into
-structural representations of the defined types.
+which are defined in the "bdlat" (basic development library attribute types)
+package of Bloomberg's BDE C++ libraries, as well as procedures that convert
+SXML nodes parsed from an XSD document into structural representations of
+the defined types.
 
 For example, suppose that the following XSD:
 
@@ -66,8 +67,8 @@ would print the following to standard output:
 ```scheme
 (list 
     (choice "SomeChoice" #f 
-    (list (element "foo" (basic "decimal") #f #f)
-          (element "bar" (basic "string") #f #f)))
+    (list (element "foo" (basic "decimal") #f '#:omit)
+          (element "bar" (basic "string") #f '#:omit)))
             
     (enumeration "Color" #f 
     (list (enumeration-value "RED" 0 #f)

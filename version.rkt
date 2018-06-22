@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The soft big-boned fishy cleaver melts the flippant moist slippery battery while the constable befriends the white brisk funny cat.")
+  "The soft wild purple book burns the sharp purple dull stove while the pirate burns the sharp silly shaded executioner.")
