@@ -76,17 +76,19 @@
       (set-member? keywords name))))
 
 (define (invalid-python-identifier? name)
-  ; Return a string stating the reason why the specified string is not a valid
-  ; python identifier, or return #f if it is a valid python identifier.
-  (cond
-    [(invalid-identifier-lexeme? name)
-      => identity] ; invalid-identifier-lexeme? returns an explanation (or #f).
-    [(python-keyword? name)
-     (~a (~s name) " is a keyword in python.")]
-    [(magic-identifier? name)
-        (~a (~s name) " is of the reserved \"magic\" form /__*__/.")]
-        [else ; it's valid 
-    #f]))
+  ; Return a string stating the reason why the specified name is not a valid
+  ; python identifier, or return #f if it is a valid python identifier. The
+  ; name can be either a string or a symbol.
+  (let ([name (~a name)])
+    (cond
+      [(invalid-identifier-lexeme? name)
+        => identity] ; invalid-identifier-lexeme? returns an explanation (or #f).
+      [(python-keyword? name)
+       (~a (~s name) " is a keyword in python.")]
+      [(magic-identifier? name)
+          (~a (~s name) " is of the reserved \"magic\" form /__*__/.")]
+          [else ; it's valid 
+      #f])))
 
 (define (shell-quote text)
   ; Quote the specified text in double quotes and escape characters necessary

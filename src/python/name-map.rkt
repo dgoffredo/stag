@@ -61,17 +61,50 @@
   ;       ((MyClass sOmEField) some_field))
   ;
   ; Raise an exception if any of the new names would be an invalid python
-  ; class name or class attribute name.
-  (for-each
-    (match-lambda [(list key value)
-      (match key
-        ; ~a is here used as a short alternative to symbol->string.
-        [(? symbol? klass)
-         (dict-set! name-map (~a klass) value)]
-        [(list (? symbol? klass) (? symbol? attr))
-         (dict-set! name-map (list (~a klass) (~a attr)) value)])])
-    overrides)
+  ; class name or class attribute name. Raise an exception if overrides has
+  ; duplicate keys.
+  (let ([previous-overrides (make-hash)]) ; Keep track to check for duplicates.
+    ; Loop over each override, applying it to name-map.
+    (for ([key/value overrides])
+      (match key/value
+        [(list key value)
+         ; If we've already seen key, raise an error.
+         (let ([previous-value (hash-ref previous-overrides key #f)])
+           (when previous-value
+             (raise-user-error 
+               (~a "The key " key " was already overridden with the value "
+                 previous-value ". Cannot override " key " to " value ".")))
 
+           ; Update name-map based on whether key is for a class or attribute.
+           (match key
+             ; overriding a class name
+             [(? symbol? klass)
+              (let ([klass (symbol->string klass)])
+                (dict-set! name-map klass
+                  (check-name value klass)))]
+     
+             ; overriding the name of an attribute within a class
+             [(list (? symbol? klass) (? symbol? attr))
+              (let ([klass (symbol->string klass)]
+                    [attr  (symbol->string attr)])
+                (dict-set! name-map (list klass attr)
+                  (check-name value attr klass)))]
+
+             ; otherwise, raise an error
+             [_ 
+             (raise-user-error (~a "--name-overrides must be a list of lists, "
+               "where each inner list contains two elements, the first being "
+               "the name to override and the second being the replacement "
+               "name. If the name to override is a class name, then that "
+               "first element is just the name itself. If the name to "
+               "override is an element name, then the first element must be a "
+               "list whose first element is the class name and whose second "
+               "element is the element name to override. The following name "
+               "specifed within the overrides is neither: " key))])
+                  
+           ; Mark key as already seen.
+           (hash-set! previous-overrides key value))])))
+  ; Return the updated mapping.
   name-map)
 
 (define split-name

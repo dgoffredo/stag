@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The enthusiastic sunken brisk cat telefrags the fragrant slippery haggard rum while the pen destroys the new marginal gritty rope.")
+  "The gritty silly sharp champion aides the slippery funny green galaxy while the conservation fights the harsh fuzzy slippery lisp.")
