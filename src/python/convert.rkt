@@ -228,7 +228,7 @@
      ; While an empty choice is nonsensical, it exists in the wild. So, make
      ; a choice only if there are elements. Otherwise make an empty sequence.
      (if (empty? elements)
-       (bdlat->class (bdlat:sequence name docs elements)) 
+       (bdlat->class (bdlat:sequence name docs elements) name-map) 
        (python-class (hash-ref name-map name)  ; name
          '(gencodeutil.Choice)                 ; base classes
          docs

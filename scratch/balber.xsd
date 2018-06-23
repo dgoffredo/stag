@@ -143,4 +143,11 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name='this one has a funny name'>
+    <xs:choice>
+      <!-- This is an empty choice, which doesn't make sense, but stag will
+           convert it into an empty sequence to maintain everyone's sanity. -->
+    </xs:choice>
+  </xs:complexType>
+
 </xs:schema>

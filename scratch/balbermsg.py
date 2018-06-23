@@ -96,3 +96,7 @@ class SomeChoice(gencodeutil.Choice):
 
     def __init__(self, **kwarg: typing.Union[float, datetime]) -> None:
         gencodeutil.Choice.__init__(self, **kwarg)
+
+
+class ThisOneHasAFunnyName(gencodeutil.Sequence):
+    pass

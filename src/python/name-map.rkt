@@ -7,6 +7,7 @@
 
 (require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
          "types.rkt"                             ; python AST structs
+         "check-name.rkt"                        ; valid python identifiers
          threading)                              ; ~> and ~>> macros
 
 (define (hash-value-prepend! table key value)
@@ -58,10 +59,13 @@
   ;
   ;     '((MyClass NewName)
   ;       ((MyClass sOmEField) some_field))
+  ;
+  ; Raise an exception if any of the new names would be an invalid python
+  ; class name or class attribute name.
   (for-each
     (match-lambda [(list key value)
       (match key
-        ; Note how ~a is used as a short alternative to symbol->string.
+        ; ~a is here used as a short alternative to symbol->string.
         [(? symbol? klass)
          (dict-set! name-map (~a klass) value)]
         [(list (? symbol? klass) (? symbol? attr))
@@ -126,10 +130,11 @@
 
 (define (extend-name-map name-map bdlat-type)
   ; Fill the specified hash table with mappings between the names of
-  ; user-defined types and elements from the specified bdlat-type into
-  ; python class and attribute names. Return the hash table, which is modified
-  ; in place (unless there are no names to map, in which case it's returned
-  ; unmodified).
+  ; user-defined types and elements from the specified bdlat-type into python
+  ; class and attribute names. Return the hash table, which is modified in
+  ; place (unless there are no names to map, in which case it's returned
+  ; unmodified). Raise an exception if any of the names mapped to would be an
+  ; invalid python class name or class attribute name.
   (let recur ([name-map name-map] ; the hash table we're populating
               [parent-name #f]    ; when we recur on a type's elements
               [item bdlat-type])  ; the bdlat struct we're inspecting
@@ -138,33 +143,48 @@
          ; Map the sequence name as a class name and then recur on each of its
          ; elements to map their names.
          (hash-set! name-map name
-           (~> name bdlat-name->class-name string->symbol))
+           (~> name 
+             bdlat-name->class-name 
+             (check-name name parent-name) 
+             string->symbol))
          (for-each (lambda (elem) (recur name-map name elem)) elements)]
 
         [(bdlat:choice name _ elements)
          ; Map the choice name as a class name and then recur on each of its
          ; elements to map their names.
          (hash-set! name-map name
-           (~> name bdlat-name->class-name string->symbol))
+           (~> name 
+             bdlat-name->class-name 
+             (check-name name parent-name) 
+             string->symbol))
          (for-each (lambda (elem) (recur name-map name elem)) elements)]
 
         [(bdlat:enumeration name _ values)
          ; Map the enumeration name as a class name and then recur on each of
          ; its values to map their names.
          (hash-set! name-map name
-           (~> name bdlat-name->class-name string->symbol))
+           (~> name 
+             bdlat-name->class-name 
+             (check-name name parent-name) 
+             string->symbol))
          (for-each (lambda (value) (recur name-map name value)) values)]
 
         [(bdlat:element name type _ _)
          ; Element names are mapped from a key that is a (list class element).
          (hash-set! name-map (list parent-name name)
-           (~> name bdlat-name->attribute-name string->symbol))]
+           (~> name 
+             bdlat-name->attribute-name 
+             (check-name name parent-name) 
+             string->symbol))]
 
         [(bdlat:enumeration-value name _ _)
          ; Enumeration value names are mapping from a key that is a
          ; (list class value).
          (hash-set! name-map (list parent-name name)
-           (~> name bdlat-name->enumeration-value-name string->symbol))])
+           (~> name 
+             bdlat-name->enumeration-value-name 
+             (check-name name parent-name) 
+             string->symbol))])
 
     ; Return the hash map, which has been (maybe) modified in place.
     name-map))
@@ -179,6 +199,9 @@
   ;
   ;  "FOOThing" -> 'FooThing
   ;  ("FOOThing" . "highWaterMark") -> 'high_water_mark
+  ;
+  ; Raise an exception if any of the names mapped to would be an invalid python
+  ; class name or class attribute name.
   (let ([name-map (make-hash)])
     (for-each (lambda (type) (extend-name-map name-map type)) types)
     name-map))
