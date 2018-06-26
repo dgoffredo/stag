@@ -5,6 +5,7 @@
 (require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
          "types.rkt"                             ; python AST structs
          "name-map.rkt"                          ; schema names -> python names
+         "check-name.rkt"                        ; valid python identifiers
          threading                               ; ~> and ~>> macros
          srfi/1)                                 ; list procedures (e.g. any)
 
@@ -317,7 +318,9 @@
           #:overrides [overrides '()]
           #:description [description *default-types-module-description*]
           #:docs [docs *default-types-module-docs*])
-  (let ([name-map (~> types bdlat->name-map (merge-overrides! overrides))])
+  (let ([name-map 
+         (~> types 
+           bdlat->name-map (merge-overrides! overrides) check-name-map)])
     (list
       ; the types module
       (bdlat->types-module

@@ -7,7 +7,6 @@
 
 (require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
          "types.rkt"                             ; python AST structs
-         "check-name.rkt"                        ; valid python identifiers
          threading)                              ; ~> and ~>> macros
 
 (define (hash-value-prepend! table key value)
@@ -79,31 +78,22 @@
            (match key
              ; overriding a class name
              [(? symbol? klass)
-              (let ([klass (symbol->string klass)])
-                (dict-set! name-map klass
-                  (check-name value klass)))]
+              (dict-set! name-map (symbol->string klass) value)]
      
              ; overriding the name of an attribute within a class
              [(list (? symbol? klass) (? symbol? attr))
-              (let ([klass (symbol->string klass)]
-                    [attr  (symbol->string attr)])
-                (dict-set! name-map (list klass attr)
-                  (check-name value attr klass)))]
+              (dict-set! name-map 
+                (list (symbol->string klass) (symbol->string attr))
+                value)]
 
              ; otherwise, raise an error
-             [_ 
-             (raise-user-error (~a "--name-overrides must be a list of lists, "
-               "where each inner list contains two elements, the first being "
-               "the name to override and the second being the replacement "
-               "name. If the name to override is a class name, then that "
-               "first element is just the name itself. If the name to "
-               "override is an element name, then the first element must be a "
-               "list whose first element is the class name and whose second "
-               "element is the element name to override. The following name "
-               "specifed within the overrides is neither: " key))])
+             [_ (raise-user-error "TODO: helpful error message")])
                   
            ; Mark key as already seen.
-           (hash-set! previous-overrides key value))])))
+           (hash-set! previous-overrides key value))]
+
+          ; The "key" in an override entry is invalid. Raise an error.
+          [_ (raise-user-error "TODO: informative error message")])))
   ; Return the updated mapping.
   name-map)
 
@@ -176,48 +166,33 @@
          ; Map the sequence name as a class name and then recur on each of its
          ; elements to map their names.
          (hash-set! name-map name
-           (~> name 
-             bdlat-name->class-name 
-             (check-name name parent-name) 
-             string->symbol))
+           (~> name bdlat-name->class-name string->symbol))
          (for-each (lambda (elem) (recur name-map name elem)) elements)]
 
         [(bdlat:choice name _ elements)
          ; Map the choice name as a class name and then recur on each of its
          ; elements to map their names.
          (hash-set! name-map name
-           (~> name 
-             bdlat-name->class-name 
-             (check-name name parent-name) 
-             string->symbol))
+           (~> name bdlat-name->class-name string->symbol))
          (for-each (lambda (elem) (recur name-map name elem)) elements)]
 
         [(bdlat:enumeration name _ values)
          ; Map the enumeration name as a class name and then recur on each of
          ; its values to map their names.
          (hash-set! name-map name
-           (~> name 
-             bdlat-name->class-name 
-             (check-name name parent-name) 
-             string->symbol))
+           (~> name bdlat-name->class-name string->symbol))
          (for-each (lambda (value) (recur name-map name value)) values)]
 
         [(bdlat:element name type _ _)
          ; Element names are mapped from a key that is a (list class element).
          (hash-set! name-map (list parent-name name)
-           (~> name 
-             bdlat-name->attribute-name 
-             (check-name name parent-name) 
-             string->symbol))]
+           (~> name bdlat-name->attribute-name string->symbol))]
 
         [(bdlat:enumeration-value name _ _)
          ; Enumeration value names are mapping from a key that is a
          ; (list class value).
          (hash-set! name-map (list parent-name name)
-           (~> name 
-             bdlat-name->enumeration-value-name 
-             (check-name name parent-name) 
-             string->symbol))])
+           (~> name bdlat-name->enumeration-value-name string->symbol))])
 
     ; Return the hash map, which has been (maybe) modified in place.
     name-map))

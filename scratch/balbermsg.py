@@ -16,7 +16,7 @@ class Color(enum.Enum):
     RED = 0
     GREEN = 1
     BLUE = 2
-    CRAZY_WACKY_COLOR = 3
+    CRAZY_WACKY_COLOR = 1337
 
 
 class BerDecoderOptions(gencodeutil.Sequence):
@@ -33,10 +33,10 @@ class BerDecoderOptions(gencodeutil.Sequence):
 
     def __init__(self,
                  *,
-                 max_depth: typing.Optional[int] = 32,
-                 skip_unknown_elements: typing.Optional[bool] = True,
-                 trace_level: typing.Optional[int] = 0,
-                 max_sequence_size: typing.Optional[int] = 8388608) -> None:
+                 max_depth: typing.Optional[int]=32,
+                 skip_unknown_elements: typing.Optional[bool]=True,
+                 trace_level: typing.Optional[int]=0,
+                 max_sequence_size: typing.Optional[int]=8388608) -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 
@@ -77,16 +77,15 @@ class BerEncoderOptions(gencodeutil.Sequence):
     color: "Color" = Color.CRAZY_WACKY_COLOR
     thing: "SomeChoice"
 
-    def __init__(
-            self,
-            *,
-            trace_level: typing.Optional[int] = 0,
-            bde_version_conformance: int = 10500,
-            encode_empty_arrays: bool = True,
-            encode_date_and_time_types_as_binary: bool = False,
-            datetime_fractional_second_precision: typing.Optional[int] = 3,
-            color: "Color" = Color.CRAZY_WACKY_COLOR,
-            thing: "SomeChoice") -> None:
+    def __init__(self,
+                 *,
+                 trace_level: typing.Optional[int]=0,
+                 bde_version_conformance: int=10500,
+                 encode_empty_arrays: bool=True,
+                 encode_date_and_time_types_as_binary: bool=False,
+                 datetime_fractional_second_precision: typing.Optional[int]=3,
+                 color: "Color"=Color.CRAZY_WACKY_COLOR,
+                 thing: "SomeChoice") -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 

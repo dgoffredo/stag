@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The gritty silly sharp champion aides the slippery funny green galaxy while the conservation fights the harsh fuzzy slippery lisp.")
+  "The childish slim sorry author kisses the childish soft flaky person while the butt insults the soaked ecumenical discounted consternation.")

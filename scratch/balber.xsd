@@ -139,7 +139,7 @@
       <xs:enumeration value='RED' />
       <xs:enumeration value='GREEN' />
       <xs:enumeration value='BLUE' />
-      <xs:enumeration value='crazy-WACKYColor' />
+      <xs:enumeration value='crazy-WACKYColor' bdem:id='1337' />
     </xs:restriction>
   </xs:simpleType>
 

@@ -17,10 +17,10 @@ def from_json(return_type: typing.Any, obj: typing.Any) -> typing.Any:
 _name_mappings = {
     balbermsg.BerEncoderOptions:
     gencodeutil.NameMapping({
-        "bde_version_conformance":
-        "BdeVersionConformance",
         "trace_level":
         "TraceLevel",
+        "bde_version_conformance":
+        "BdeVersionConformance",
         "datetime_fractional_second_precision":
         "DatetimeFractionalSecondPrecision",
         "encode_empty_arrays":

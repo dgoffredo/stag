@@ -1,7 +1,8 @@
-Here's what python says about identifiers:
-
-    identifier   ::=  xid_start xid_continue*
-
-    id_start     ::=  <Lu, Ll, Lt, Lm, Lo, Nl, the underscore>
-
-    id_continue  ::=  <id_start, categories Mn, Mc, Nd, Pc>
+TODO
+----
+- Include the version in the python modules.
+- Fix `to_json` and `from_json`.
+- Support datetimes in `from_json`.
+- Elide unmodified names from `_name_mappings` (and modify `to_json` and
+  `from_json` to account for this).
+- Uniquify the type arguments to `typing.Union` in `Choice` initializers.

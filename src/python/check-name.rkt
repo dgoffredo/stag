@@ -1,6 +1,7 @@
 #lang racket
 
-(provide check-name
+(provide check-name-map
+         check-name
          invalid-python-identifier?)
 
 (define (quoted char)
@@ -120,3 +121,16 @@
                        <new-name>]))))))
       ; Otherwise, the name is valid, so just return it.
       name)))
+
+(define (check-name-map name-map)
+  ; Return the specified name-map if its values are all valid python
+  ; identifiers. If any of its values is not a valid python identifier, raise
+  ; a user error describing what is wrong with the value, and suggesting how
+  ; the user could override the value on the command line.
+  (for ([(key name) name-map])
+    (match key
+      [(list klass attr) (check-name name attr klass)]
+      [klass             (check-name name klass)]))
+
+  name-map)
+    
