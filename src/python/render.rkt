@@ -77,13 +77,23 @@
       indent-level 
       indent-spaces))
 
+(define TRIPQ "\"\"\"") ; triple quote
+
+(define (triple-quoted-docs docs indent-level indent-spaces)
+  (if (empty? docs)
+    ""
+    (let* ([margin-length (* indent-level indent-spaces)]
+           [margin        (make-string margin-length #\space)]
+           ; Prepend a triple quote to the first paragraph.
+           [docs          (cons (~a TRIPQ (first docs)) (rest docs))])
+      (~a (format-docs docs #:prefix margin) "\n" margin TRIPQ "\n"))))
+
 (define (render-python form [indent-level 0] [indent-spaces 4])
   ; Return a string containing the python code corresponding to the specified
   ; form, which must be some composition of python-* structs, strings,
   ; symbols, etc. Prefix each line with the specified level of indentation,
   ; where each level has the specified number of space characters.
   (let* ([INDENT  (make-string (* indent-level indent-spaces) #\space)]
-         [TRIPQ   "\"\"\""] ; triple quote
          ; Recurse into this procedure, preserving auxiliary arguments.
          [recur   (lambda (form [indent-level indent-level])
                     (render-python form indent-level indent-spaces))]
@@ -149,13 +159,7 @@
              (~a "(" bases-text ")")))
          ":\n"
          ; documentation
-         (if (empty? docs)
-           ""
-           (let* ([margin-length (* (+ indent-level 1) indent-spaces)]
-                  [margin        (make-string margin-length #\space)]
-                  ; Prepend a triple quote to the first paragraph.
-                  [docs          (cons (~a TRIPQ (first docs)) (rest docs))])
-             (~a (format-docs docs #:prefix margin) "\n" margin TRIPQ "\n")))
+         (triple-quoted-docs docs (+ indent-level 1) indent-spaces)
          ; statements
          (string-join (map recur+1 statements) "\n"))]
 
@@ -198,11 +202,14 @@
       [(python-pass)
        (~a INDENT "pass\n")]
 
-      [(python-def name args type body)
+      [(python-def name args type docs body)
        ; def name(arg1, arg2):
        ;     body...
        (~a INDENT "def " name "(" (csv args indent-level indent-spaces) ")"
          (if (equal? type '#:omit) "" (~a " -> " (recur type))) ":\n"
+         ; documentation
+         (triple-quoted-docs docs (+ indent-level 1) indent-spaces)
+         ; body
          (string-join (map recur+1 body) "")
          "\n")]
 

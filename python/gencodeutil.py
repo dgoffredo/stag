@@ -1,11 +1,13 @@
 '''serialization utilities used in generated classes
 
-TODO
+Provide base classes, utility types, and conversion routines for generated
+classes.
 '''
 
 from enum import Enum
 from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple, Type, Union
 
+import decimal
 import datetime
 import re
 
@@ -83,7 +85,7 @@ class NameMapping:
         }
 
 
-def to_json(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
+def to_jsonable(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
     # TODO Need to handle blobs (and possibly other XSD types)
     if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float):
         return obj
@@ -95,18 +97,18 @@ def to_json(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
     elif isinstance(obj, Enum):
         return name_mappings[type(obj)].py_to_schema[obj.name]
     elif isinstance(obj, list):
-        return [to_json(item, name_mappings) for item in obj]
+        return [to_jsonable(item, name_mappings) for item in obj]
     elif isinstance(obj, Choice):
         return {
             name_mappings[type(obj)].py_to_schema[obj._selection]: \
-                to_json(getattr(obj, obj._selection), name_mappings)
+                to_jsonable(getattr(obj, obj._selection), name_mappings)
         }
     else:
         if not isinstance(obj, Sequence):
             raise ValueError(
-                f'Unable to to_json object with unsupported type {type(obj)}.')
+                f'Unable to to_jsonable object with unsupported type {type(obj)}.')
         return {
-            elem: to_json(getattr(obj, attr), name_mappings) \
+            elem: to_jsonable(getattr(obj, attr), name_mappings) \
             for attr, elem in name_mappings[type(obj)].py_to_schema.items() \
             if getattr(obj, attr) is not None
         }
@@ -120,12 +122,12 @@ def _parse_interval(hours : str,
     'minutes' are formatted as integers, while the input argument 'seconds' may
     be formatted as either an integer or a float.
     """
-    seconds_float = float(seconds or 0)
-    return_seconds = int(seconds_float)
-    fractional = seconds_float - return_seconds
-    milliseconds_float = fractional * 1000
-    milliseconds = int(milliseconds_float)
-    microseconds = int((milliseconds_float - milliseconds) * 1000)
+    seconds_dec = decimal.Decimal(seconds or 0)
+    return_seconds = int(seconds_dec)
+    fractional = seconds_dec - return_seconds
+    milliseconds_dec = fractional * 1000
+    milliseconds = int(milliseconds_dec)
+    microseconds = int((milliseconds_dec - milliseconds) * 1000)
 
     return (int(hours), 
             int(minutes or 0), 
@@ -149,7 +151,7 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
                     fr'(?P<minute>\d\d):'
                     fr'(?P<second>\d\d(\.\d+)?)')
     zulu_pattern = fr'(?P<zulu>Z)'
-    offset_pattern = (fr'[-+](?P<offset_hours>\d\d)(:?'
+    offset_pattern = (fr'(?P<offset_sign>[-+])(?P<offset_hours>\d\d)(:?'
                       fr'(?P<offset_minutes>\d\d)(:?'
                       fr'(?P<offset_seconds>\d\d(\.\d+)?))?)?')
     zone_pattern = fr'{zulu_pattern}|{offset_pattern}'
@@ -163,18 +165,21 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
 
     tzinfo = None
     if groups['zulu'] is not None:
-        tzinfo = datetime.timezone(datetime.timedelta(), 'UTC')
-    elif groups['offset_hours'] is not None:
+        tzinfo = datetime.timezone.utc
+    elif groups['offset_sign'] is not None:
         hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
             groups['offset_hours'], 
             groups['offset_minutes'], 
             groups['offset_seconds'])
+
+        sign = {'-': -1, '+': +1}[groups['offset_sign']]
+        
         tzinfo = datetime.timezone(
-            datetime.timedelta(seconds=seconds, 
-                               microseconds=microseconds,
-                               milliseconds=milliseconds, 
-                               minutes=minutes, 
-                               hours=hours))
+            sign * datetime.timedelta(seconds=seconds, 
+                                      microseconds=microseconds,
+                                      milliseconds=milliseconds, 
+                                      minutes=minutes, 
+                                      hours=hours))
 
     if groups['year'] is None:
         # It's just a time.
@@ -182,10 +187,11 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
             groups['hour'], 
             groups['minute'], 
             groups['second'])
+
         return datetime.time(hour=hours, 
                              minute=minutes, 
                              second=seconds, 
-                             microsecond=microseconds, 
+                             microsecond=(microseconds + 1000 * milliseconds), 
                              tzinfo=tzinfo)
     elif groups['hour'] is None:
         # It's just a date. Note that time zone information is ignored.
@@ -198,9 +204,6 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
         groups['hour'], 
         groups['minute'], 
         groups['second'])
-    # datetime.datetime's constructor takes 'microsecond' without
-    # 'millisecond', so multiply the milliseconds into the microseconds.
-    microseconds += 1000 * milliseconds
 
     return datetime.datetime(int(groups['year']), 
                              int(groups['month']), 
@@ -208,13 +211,13 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
                              hours,
                              minutes,
                              seconds,
-                             microseconds,
+                             microseconds + 1000 * milliseconds,
                              tzinfo)
     
 
-def from_json(return_type: Any, 
-              obj: Any,
-              name_mappings: Mapping[type, NameMapping]) -> Any:
+def from_jsonable(return_type: Any, 
+                  obj: Any,
+                  name_mappings: Mapping[type, NameMapping]) -> Any:
     # Note that while this function is annotated as returning any type, it in
     # fact returns a value having the specified 'return_type'.
     # TODO Need to handle blobs (and possibly other XSD types)
@@ -236,7 +239,7 @@ def from_json(return_type: Any,
         return return_type[name_mappings[type(obj)].schema_to_py[obj.name]]
     elif issubclass(return_type, list):
         elem_type, = return_type.__args__
-        return [from_json(elem_type, elem, name_mappings) for elem in obj]
+        return [from_jsonable(elem_type, elem, name_mappings) for elem in obj]
     else:
         # Assume that 'return_type' is derived from either 'Sequence' or
         # 'Choice', so that we can just invoke its constructor with keyword
@@ -248,5 +251,5 @@ def from_json(return_type: Any,
         for elem, value in obj.items():
             attr = schema_to_py[elem]
             elem_type = return_type.__annotations__[attr]
-            attr_values[attr] = from_json(elem_type, value, name_mappings)
+            attr_values[attr] = from_jsonable(elem_type, value, name_mappings)
         return return_type(**attr_values)

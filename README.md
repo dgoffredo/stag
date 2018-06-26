@@ -44,7 +44,7 @@ Invoke `stag` as a command line tool:
 
 To the current directory or a specified directory the script writes two
 files: one containing the generated class definitions (`foosvcmsg.py`), and
-another containing the implementations of the `to_json` and `from_json`
+another containing the implementations of the `to_jsonable` and `from_jsonable`
 functions (`foosvcmsgutil.py`).
 
 `stag` also accepts various options:

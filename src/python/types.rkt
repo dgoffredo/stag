@@ -48,6 +48,7 @@
   (name  ; symbol
    args  ; list of either symbol or python-annotation
    type  ; return type, or '#:omit to ignore
+   docs  ; list of paragraphs (strings)
    body) ; list of statements
   #:transparent)
 

@@ -4,12 +4,12 @@ import shoesvcmsg
 import gencodeutil
 
 
-def to_json(obj):
-    return gencodeutil.to_json(obj, _name_mappings)
+def to_jsonable(obj):
+    return gencodeutil.to_jsonable(obj, _name_mappings)
 
 
-def from_json(return_type, obj):
-    return gencodeutil.from_json(return_type, obj, _name_mappings)
+def from_jsonable(return_type, obj):
+    return gencodeutil.from_jsonable(return_type, obj, _name_mappings)
 
 
 _name_mappings = {

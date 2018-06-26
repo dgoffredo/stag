@@ -221,6 +221,7 @@
                 ; except without the documentation (to spare the newlines).
                 `(self * ,@(map annotation->argument annotations))
                 'None ; return type
+                '() ; docs
                 ; __init__ body: forward all args to the base class
                 (list (python-invoke 'gencodeutil.Sequence.__init__
                   (list (python-invoke '**locals '())))))))))]
@@ -246,6 +247,7 @@
                       [type (cons 'typing.Union types)])
                  (list 'self (python-argument '**kwarg type '#:omit)))
                'None ; return type
+               '() ; docs
                ; __init__ body: forward all kwargs to the base class
                (list (python-invoke 'gencodeutil.Choice.__init__
                  '(self **kwarg))))))))]
@@ -292,19 +294,38 @@
           (python-import 'typing '()))
     ; statements (body)
     (list
-      ; def to_json ...
-      (python-def 'to_json (list (python-argument 'obj 'typing.Any '#:omit))
+      ; def to_jsonable ...
+      (python-def 'to_jsonable
+        (list (python-argument 'obj 'typing.Any '#:omit)) ; arguments
         'typing.Any ; return type
+        ; docs
+        (list
+          (string-join '("Return a composition of python objects (such as "
+                         "'dict', 'list' and 'str') based on the specified "
+                         "'obj' such that the result is suitable for "
+                         "serialization to JSON by the 'json' module.")
+            ""))
+        ; body
         (list (python-return
-          (python-invoke 'gencodeutil.to_json '(obj _name_mappings)))))
-      ; def from_json ...
-      (python-def 'from_json 
+          (python-invoke 'gencodeutil.to_jsonable '(obj _name_mappings)))))
+      ; def from_jsonable ...
+      (python-def 'from_jsonable 
+        ; arguments
         (list (python-argument 'return_type 'typing.Any '#:omit)
               (python-argument 'obj         'typing.Any '#:omit))
-        'typing.Any
+        'typing.Any ; function return type
+        ; docs
+        (list
+          (string-join
+            '("Return an instance of the specified 'return_type' that has "
+              "been constructed based on the specified 'obj', which is a "
+              "composition of python objects as would result from "
+              "JSON deserialization by the 'json' module.")
+            ""))
+        ; body
         (list (python-return
           (python-invoke
-            'gencodeutil.from_json
+            'gencodeutil.from_jsonable
             '(return_type obj _name_mappings)))))
       ; _name_mappings = { ...
       (python-assignment

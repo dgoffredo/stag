@@ -6,21 +6,29 @@ import gencodeutil
 import typing
 
 
-def to_json(obj: typing.Any) -> typing.Any:
-    return gencodeutil.to_json(obj, _name_mappings)
+def to_jsonable(obj: typing.Any) -> typing.Any:
+    """Return a composition of python objects (such as 'dict', 'list' and
+    'str') based on the specified 'obj' such that the result is suitable for
+    serialization to JSON by the 'json' module.
+    """
+    return gencodeutil.to_jsonable(obj, _name_mappings)
 
 
-def from_json(return_type: typing.Any, obj: typing.Any) -> typing.Any:
-    return gencodeutil.from_json(return_type, obj, _name_mappings)
+def from_jsonable(return_type: typing.Any, obj: typing.Any) -> typing.Any:
+    """Return an instance of the specified 'return_type' that has been
+    constructed based on the specified 'obj', which is a composition of python
+    objects as would result from JSON deserialization by the 'json' module.
+    """
+    return gencodeutil.from_jsonable(return_type, obj, _name_mappings)
 
 
 _name_mappings = {
     balbermsg.BerEncoderOptions:
     gencodeutil.NameMapping({
-        "trace_level":
-        "TraceLevel",
         "bde_version_conformance":
         "BdeVersionConformance",
+        "trace_level":
+        "TraceLevel",
         "datetime_fractional_second_precision":
         "DatetimeFractionalSecondPrecision",
         "encode_empty_arrays":
