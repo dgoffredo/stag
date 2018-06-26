@@ -23,23 +23,6 @@ def from_jsonable(return_type: typing.Any, obj: typing.Any) -> typing.Any:
 
 
 _name_mappings = {
-    balbermsg.BerEncoderOptions:
-    gencodeutil.NameMapping({
-        "bde_version_conformance":
-        "BdeVersionConformance",
-        "trace_level":
-        "TraceLevel",
-        "datetime_fractional_second_precision":
-        "DatetimeFractionalSecondPrecision",
-        "encode_empty_arrays":
-        "EncodeEmptyArrays",
-        "thing":
-        "thing",
-        "color":
-        "color",
-        "encode_date_and_time_types_as_binary":
-        "EncodeDateAndTimeTypesAsBinary"
-    }),
     balbermsg.Color:
     gencodeutil.NameMapping({
         "BLUE": "BLUE",
@@ -54,10 +37,29 @@ _name_mappings = {
         "skip_unknown_elements": "SkipUnknownElements",
         "max_sequence_size": "MaxSequenceSize"
     }),
+    balbermsg.BerEncoderOptions:
+    gencodeutil.NameMapping({
+        "encode_empty_arrays":
+        "EncodeEmptyArrays",
+        "trace_level":
+        "TraceLevel",
+        "color":
+        "color",
+        "datetime_fractional_second_precision":
+        "DatetimeFractionalSecondPrecision",
+        "thing":
+        "thing",
+        "encode_date_and_time_types_as_binary":
+        "EncodeDateAndTimeTypesAsBinary",
+        "bde_version_conformance":
+        "BdeVersionConformance"
+    }),
     balbermsg.SomeChoice:
     gencodeutil.NameMapping({
-        "bar": "bar",
-        "foo": "foo"
+        "baz": "baz",
+        "boo": "boo",
+        "foo": "foo",
+        "bar": "bar"
     })
 }
 

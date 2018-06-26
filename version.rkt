@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The funny chipper chilled plank kisses the happy conservative harsh executioner while the food resuscitates the spacious savory fragrant plant.")
+  "The silly brazen slimey galaxy educates the marginal soft shaded horse while the cat entrances the soft wild happy airplane.")

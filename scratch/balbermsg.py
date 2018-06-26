@@ -6,6 +6,8 @@ Instances of the types defined in this module are immutable, and may be
 converted to and from JSON-compatible objects using the similarly-named
 utilities module that is dual to this module.
 """
+from datetime import time
+from datetime import date
 from datetime import datetime
 import enum
 import gencodeutil
@@ -33,10 +35,10 @@ class BerDecoderOptions(gencodeutil.Sequence):
 
     def __init__(self,
                  *,
-                 max_depth: typing.Optional[int] = 32,
-                 skip_unknown_elements: typing.Optional[bool] = True,
-                 trace_level: typing.Optional[int] = 0,
-                 max_sequence_size: typing.Optional[int] = 8388608) -> None:
+                 max_depth: typing.Optional[int]=32,
+                 skip_unknown_elements: typing.Optional[bool]=True,
+                 trace_level: typing.Optional[int]=0,
+                 max_sequence_size: typing.Optional[int]=8388608) -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 
@@ -77,24 +79,27 @@ class BerEncoderOptions(gencodeutil.Sequence):
     color: "Color" = Color.CRAZY_WACKY_COLOR
     thing: "SomeChoice"
 
-    def __init__(
-            self,
-            *,
-            trace_level: typing.Optional[int] = 0,
-            bde_version_conformance: int = 10500,
-            encode_empty_arrays: bool = True,
-            encode_date_and_time_types_as_binary: bool = False,
-            datetime_fractional_second_precision: typing.Optional[int] = 3,
-            color: "Color" = Color.CRAZY_WACKY_COLOR,
-            thing: "SomeChoice") -> None:
+    def __init__(self,
+                 *,
+                 trace_level: typing.Optional[int]=0,
+                 bde_version_conformance: int=10500,
+                 encode_empty_arrays: bool=True,
+                 encode_date_and_time_types_as_binary: bool=False,
+                 datetime_fractional_second_precision: typing.Optional[int]=3,
+                 color: "Color"=Color.CRAZY_WACKY_COLOR,
+                 thing: "SomeChoice") -> None:
         gencodeutil.Sequence.__init__(**locals())
 
 
 class SomeChoice(gencodeutil.Choice):
     foo: float
     bar: datetime
+    baz: typing.List[date] = []
+    boo: typing.Optional[time] = None
 
-    def __init__(self, **kwarg: typing.Union[float, datetime]) -> None:
+    def __init__(self,
+                 **kwarg: typing.Union[float, datetime, typing.List[date],
+                                       typing.Optional[time]]) -> None:
         gencodeutil.Choice.__init__(self, **kwarg)
 
 

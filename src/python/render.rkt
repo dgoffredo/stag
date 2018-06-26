@@ -80,6 +80,27 @@
 (define TRIPQ "\"\"\"") ; triple quote
 
 (define (triple-quoted-docs docs indent-level indent-spaces)
+  ; Return a string rendering of the specified documentation (a list of strings
+  ; where each string represents a paragraph) in a python extended quote, with
+  ; double quote characters, where lines are wrapped and paragraphs are
+  ; separated by an empty line, all at the specified indentation.
+  ; For example,
+  ;
+  ;     '("Here is the first paragraph; let's assume the max width is small."
+  ;       "Here is the second paragraph, this one is shorter."
+  ;       "And there's one more.")
+  ;
+  ; might yield (depending on the indentation)
+  ;
+  ;     """Here is the first paragraph; let's
+  ;     assume the max width is small.
+  ;
+  ;     Here is the second paragraph, this one
+  ;     is shorter.
+  ;
+  ;     And there's one more.
+  ;     """
+  ;
   (if (empty? docs)
     ""
     (let* ([margin-length (* indent-level indent-spaces)]
@@ -87,6 +108,32 @@
            ; Prepend a triple quote to the first paragraph.
            [docs          (cons (~a TRIPQ (first docs)) (rest docs))])
       (~a (format-docs docs #:prefix margin) "\n" margin TRIPQ "\n"))))
+
+(define (format-type type indent-level indent-spaces)
+  ; Return a string rendering of the specified type name at the specified
+  ; indentation. For example:
+  ;
+  ;     '(typing.Optional "Foo")              
+  ; --> "typing.Optional[\"Foo\"]"
+  ;
+  ;     '(typing.Union str (typing.List int))
+  ; --> "typing.Union[str, typing.List[int]]"
+  ;
+  ;     'datetime
+  ; --> "datetime"
+  ;
+  ;     "Foo"
+  ; --> "\"Foo\""     
+  (let ([recur (lambda (type) (format-type type indent-level indent-spaces))])
+    (match type
+      ; typing.Optional["Foo"] or typing.Union[str, typing.List[int]]
+      [(list metatype types ...)
+       (~a metatype "["
+         (string-join (map recur types) ", ")
+         "]")]
+      ; str or datetime or "Bar"
+      [_
+       (render-python type indent-level indent-spaces)])))
 
 (define (render-python form [indent-level 0] [indent-spaces 4])
   ; Return a string containing the python code corresponding to the specified
@@ -177,15 +224,7 @@
          ; the type name
          (if (equal? type '#:omit)
            ""
-           (~a " : "
-             (if (list? type)
-               ; If type is a list, then it's something like
-               ; typing.Optional["Foo"] or typing.Union[str, int].
-               (~a (first type) "["
-                 (string-join (map recur (rest type)) ", ")
-                 "]")
-               ; If type is not a list, then just print it.
-               (recur type))))
+           (~a " : "(format-type type indent-level indent-spaces)))
          ; the default (assigned) value
          (if (equal? default '#:omit)
            ""
@@ -206,7 +245,9 @@
        ; def name(arg1, arg2):
        ;     body...
        (~a INDENT "def " name "(" (csv args indent-level indent-spaces) ")"
-         (if (equal? type '#:omit) "" (~a " -> " (recur type))) ":\n"
+         (if (equal? type '#:omit) 
+           "" 
+           (~a " -> " (format-type type indent-level indent-spaces))) ":\n"
          ; documentation
          (triple-quoted-docs docs (+ indent-level 1) indent-spaces)
          ; body

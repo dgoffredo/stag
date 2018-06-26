@@ -131,6 +131,9 @@
     <xs:choice>
       <xs:element name='foo' type='xs:decimal' />
       <xs:element name='bar' type='xs:dateTime' />
+      <xs:element name='baz' type='xs:date' 
+                  minOccurs='0' maxOccurs='unbounded' />
+      <xs:element name='boo' type='xs:time' minOccurs='0' maxOccurs='1' />
     </xs:choice>
   </xs:complexType>
 
