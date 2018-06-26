@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The silly brazen slimey galaxy educates the marginal soft shaded horse while the cat entrances the soft wild happy airplane.")
+  "The excessive silly purple gerbil incinerates the sunken tiny black horse while the whale electrocutes the big-boned jaded second staple.")

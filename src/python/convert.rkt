@@ -243,8 +243,18 @@
              ; def __init__ ...
              ,(python-def '__init__
                ; __init__ args: self, **kwarg : typing.Union[...
-               (let* ([types (map python-annotation-type annotations)]
-                      [type (cons 'typing.Union types)])
+               ;
+               ; where the arguments to typing.Union are distinct (they don't
+               ; have to be, since python knows that anyway, but it looks
+               ; nicer if you don't have str, str, str, str, ...). Also, if
+               ; there is only one type among the annotations, don't bother
+               ; with a typing.Union -- just use the one type.
+               (let* ([types (~>> annotations
+                               (map python-annotation-type)
+                               remove-duplicates)]
+                      [type (if (= 1 (length types))
+                              (first types)
+                              (cons 'typing.Union types))])
                  (list 'self (python-argument '**kwarg type '#:omit)))
                'None ; return type
                '() ; docs
