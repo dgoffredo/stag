@@ -236,7 +236,7 @@ def from_jsonable(return_type: Any,
     elif issubclass(return_type, datetime.timedelta):
         raise NotImplementedError('Time intervals are not supported.')
     elif issubclass(return_type, Enum):
-        return return_type[name_mappings[type(obj)].schema_to_py[obj.name]]
+        return return_type[name_mappings[return_type].schema_to_py[obj.name]]
     elif issubclass(return_type, list):
         elem_type, = return_type.__args__
         return [from_jsonable(elem_type, elem, name_mappings) for elem in obj]

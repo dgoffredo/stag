@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The slippery childish sunken badger paints the friendly sunken soaked dog while the skunk telefrags the dull jaded fried whale.")
+  "The ecumenical curious agnostic sword smothers the massive haggard discounted horse while the napkin intimidates the maroon white clinical gerbil.")
