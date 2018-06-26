@@ -4,9 +4,10 @@ TODO
 '''
 
 from enum import Enum
-from typing import Any, Dict, Iterator, List, Mapping, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple, Type, Union
 
 import datetime
+import re
 
 
 class Sequence:
@@ -75,6 +76,7 @@ class NameMapping:
 
     def __init__(self, py_to_schema: Mapping[str, str]) -> None:
         self.py_to_schema = py_to_schema
+        # TODO: Detect duplicates.
         self.schema_to_py = {
             value: name
             for name, value in py_to_schema.items()
@@ -89,17 +91,20 @@ def to_json(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
           or isinstance(obj, datetime.time)):
         return obj.isoformat()
     elif isinstance(obj, datetime.timedelta):
-        raise NotImplementedError()  # TODO
+        raise NotImplementedError('Time intervals are not supported.')
     elif isinstance(obj, Enum):
         return name_mappings[type(obj)].py_to_schema[obj.name]
     elif isinstance(obj, list):
         return [to_json(item, name_mappings) for item in obj]
-    elif hasattr(obj, '_selection'):  # TODO
+    elif isinstance(obj, Choice):
         return {
             name_mappings[type(obj)].py_to_schema[obj._selection]: \
                 to_json(getattr(obj, obj._selection), name_mappings)
         }
-    else:  # TODO
+    else:
+        if not isinstance(obj, Sequence):
+            raise ValueError(
+                f'Unable to to_json object with unsupported type {type(obj)}.')
         return {
             elem: to_json(getattr(obj, attr), name_mappings) \
             for attr, elem in name_mappings[type(obj)].py_to_schema.items() \
@@ -107,28 +112,141 @@ def to_json(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
         }
 
 
-def from_json(return_type: Any, obj: Any,
+def _parse_interval(hours : str,
+                    minutes : Optional[str], 
+                    seconds : Optional[str]) -> Tuple[int, int, int, int, int]:
+    """Return (hours, minutes, seconds, milliseconds, microseconds) from
+    the specified timestamp parts, where the input arguments 'hours' and
+    'minutes' are formatted as integers, while the input argument 'seconds' may
+    be formatted as either an integer or a float.
+    """
+    seconds_float = float(seconds or 0)
+    return_seconds = int(seconds_float)
+    fractional = seconds_float - return_seconds
+    milliseconds_float = fractional * 1000
+    milliseconds = int(milliseconds_float)
+    microseconds = int((milliseconds_float - milliseconds) * 1000)
+
+    return (int(hours), 
+            int(minutes or 0), 
+            return_seconds, 
+            milliseconds, 
+            microseconds)
+
+def _parse_iso8601(isoformat : str) -> Union[datetime.date,
+                                             datetime.time, 
+                                             datetime.datetime]:
+    """Return an object parsed from the specified 'isoformat', which must be
+    an ISO-8601 compatible date, time, or datetime, with the exception that
+    none of week numbers, ordinal dates, nor dates without a year are
+    supported. The type of object returned depends on the contents of
+    'isoformat'. For example, "2018-06-25" yields a 'datetime.date',
+    "12:34:18.332" yields a 'datetime.time', and "2016-01-01T08:54:33Z"
+    yields a 'datetime.datetime'.
+    """
+    date_pattern = fr'(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)'
+    time_pattern = (fr'(?P<hour>\d\d):'
+                    fr'(?P<minute>\d\d):'
+                    fr'(?P<second>\d\d(\.\d+)?)')
+    zulu_pattern = fr'(?P<zulu>Z)'
+    offset_pattern = (fr'[-+](?P<offset_hours>\d\d)(:?'
+                      fr'(?P<offset_minutes>\d\d)(:?'
+                      fr'(?P<offset_seconds>\d\d(\.\d+)?))?)?')
+    zone_pattern = fr'{zulu_pattern}|{offset_pattern}'
+    pattern = fr'^({date_pattern})?[T ]?({time_pattern})?({zone_pattern})?$'
+
+    match = re.match(pattern, isoformat)
+    if not match:
+        raise ValueError(f'Unable to parse as ISO-8601: {repr(isoformat)}')
+
+    groups = match.groupdict()
+
+    tzinfo = None
+    if groups['zulu'] is not None:
+        tzinfo = datetime.timezone(datetime.timedelta(), 'UTC')
+    elif groups['offset_hours'] is not None:
+        hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
+            groups['offset_hours'], 
+            groups['offset_minutes'], 
+            groups['offset_seconds'])
+        tzinfo = datetime.timezone(
+            datetime.timedelta(seconds=seconds, 
+                               microseconds=microseconds,
+                               milliseconds=milliseconds, 
+                               minutes=minutes, 
+                               hours=hours))
+
+    if groups['year'] is None:
+        # It's just a time.
+        hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
+            groups['hour'], 
+            groups['minute'], 
+            groups['second'])
+        return datetime.time(hour=hours, 
+                             minute=minutes, 
+                             second=seconds, 
+                             microsecond=microseconds, 
+                             tzinfo=tzinfo)
+    elif groups['hour'] is None:
+        # It's just a date. Note that time zone information is ignored.
+        return datetime.date(int(groups['year']), 
+                             int(groups['month']), 
+                             int(groups['day']))
+    
+    # Otherwise, it's a datetime.
+    hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
+        groups['hour'], 
+        groups['minute'], 
+        groups['second'])
+    # datetime.datetime's constructor takes 'microsecond' without
+    # 'millisecond', so multiply the milliseconds into the microseconds.
+    microseconds += 1000 * milliseconds
+
+    return datetime.datetime(int(groups['year']), 
+                             int(groups['month']), 
+                             int(groups['day']),
+                             hours,
+                             minutes,
+                             seconds,
+                             microseconds,
+                             tzinfo)
+    
+
+def from_json(return_type: Any, 
+              obj: Any,
               name_mappings: Mapping[type, NameMapping]) -> Any:
     # Note that while this function is annotated as returning any type, it in
     # fact returns a value having the specified 'return_type'.
     # TODO Need to handle blobs (and possibly other XSD types)
-    if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float):
+    if issubclass(return_type, (str, int, float)):
         return return_type(obj)
-    elif (isinstance(obj, datetime.datetime) or isinstance(obj, datetime.date)
-          or isinstance(obj, datetime.time)):
-        raise NotImplementedError()  # TODO
-    elif isinstance(obj, datetime.timedelta):
-        raise NotImplementedError()  # TODO
-    elif isinstance(obj, Enum):
-        return type(obj)[name_mappings[type(obj)].schema_to_py[obj.name]]
-    elif isinstance(obj, list):
+    elif issubclass(return_type, 
+                    (datetime.datetime, datetime.date, datetime.time)):
+        if not isinstance(obj, str):
+            raise ValueError(
+                f'Unable to parse a {return_type} from a {type(object)}.')
+        result = _parse_iso8601(obj)
+        if not isinstance(result, return_type):
+            raise ValueError(f'Expected a {return_type} but parsed a '
+                             f'{type(result)} from {repr(obj)}')
+        return result
+    elif issubclass(return_type, datetime.timedelta):
+        raise NotImplementedError('Time intervals are not supported.')
+    elif issubclass(return_type, Enum):
+        return return_type[name_mappings[type(obj)].schema_to_py[obj.name]]
+    elif issubclass(return_type, list):
         elem_type, = return_type.__args__
         return [from_json(elem_type, elem, name_mappings) for elem in obj]
-    else:  # TODO
-        schema_to_py = name_mappings[type(obj)].schema_to_py
+    else:
+        # Assume that 'return_type' is derived from either 'Sequence' or
+        # 'Choice', so that we can just invoke its constructor with keyword
+        # arguments mapped from the keys and values of 'obj'. We know the types
+        # of the attributes within 'return_type' by examining its
+        # '__annotations__'.
+        schema_to_py = name_mappings[return_type].schema_to_py
         attr_values = {}
         for elem, value in obj.items():
             attr = schema_to_py[elem]
-            elem_type = type(obj).__annotations__[attr]
+            elem_type = return_type.__annotations__[attr]
             attr_values[attr] = from_json(elem_type, value, name_mappings)
         return return_type(**attr_values)

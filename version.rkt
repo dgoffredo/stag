@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The symbolic slippery flaky language obstructs the big-boned new happy pear while the coffee kisses the wild white excessive pear.")
+  "The sorry fragrant flippant frier burns the bruised slippery agnostic consternation while the pot massages the silly moist friendly chicken.")
