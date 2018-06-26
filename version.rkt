@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The childish slim sorry author kisses the childish soft flaky person while the butt insults the soaked ecumenical discounted consternation.")
+  "The symbolic slippery flaky language obstructs the big-boned new happy pear while the coffee kisses the wild white excessive pear.")

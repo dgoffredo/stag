@@ -2,9 +2,10 @@
 
 (provide render-python)
 
-(require "types.rkt"         ; python AST structs (what we're rendering)
-         threading           ; ~> and ~>> macros
-         scribble/text/wrap) ; (wrap-line text num-chars)
+(require "types.rkt"              ; python AST structs (what we're rendering)
+         "../version/version.rkt" ; version string for this code generator
+         threading                ; ~> and ~>> macros
+         scribble/text/wrap)      ; (wrap-line text num-chars)
 
 (define (csv list-of-symbols indent-level indent-spaces)
   ; Return "foo, bar, baz" given '(foo bar baz). This operation is performed
@@ -26,11 +27,7 @@
   ; returns
   ;
   ;     '(1 "hello" 2 "hello" 3)
-  (match lst
-    ; empty list or list of one element -> that list
-    [(or '() (list _)) lst]
-    ; list of two or more elements -> (list head separator ...)
-    [(cons head tail)  (cons head (cons sep (interpose sep tail)))]))
+  (~> lst (sequence-add-between sep) sequence->list))
 
 (define (format-docs docs #:prefix [prefix ""] #:width [width 79])
   ; Return a string containing the specified list of paragraphs wrapped to
@@ -62,6 +59,23 @@
        (map (lambda (line) (string-append prefix line)))
        (map (lambda (line) (string-trim line #:left? #f)))
        (string-join _ "\n")))
+
+(define (render-version indent-level indent-spaces)
+    ; Return a string of python code that assigns this code generator's version
+    ; string to a variable.
+    (render-python
+      (python-assignment
+        '_code_generator_version ; left-hand side
+        *stag-version*           ; right-hand side
+        ; documentation
+        (list (string-join 
+                '("This is the version string identifying the version of stag "
+                  "that generated this code. Search through the code "
+                  "generator's git repository history for this string to find "
+                  "the commit of the contemporary code generator.")
+                "")))
+      indent-level 
+      indent-spaces))
 
 (define (render-python form [indent-level 0] [indent-spaces 4])
   ; Return a string containing the python code corresponding to the specified
@@ -97,7 +111,9 @@
          (string-join (map recur imports) "")
          "\n\n"
          ; statements (classes, functions, globals, etc.)
-         (string-join (map recur statements) "\n\n"))]
+         (string-join (map recur statements) "\n\n")
+         ; code generator version variable
+         "\n\n" (render-version indent-level indent-spaces))]
 
       [(python-import from-module names)
        ; can be one of

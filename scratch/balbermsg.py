@@ -99,3 +99,9 @@ class SomeChoice(gencodeutil.Choice):
 
 class ThisOneHasAFunnyName(gencodeutil.Sequence):
     pass
+
+
+# This is the version string identifying the version of stag that generated
+# this code. Search through the code generator's git repository history for
+# this string to find the commit of the contemporary code generator.
+_code_generator_version = "The tiny sunken funny constable overrides the tiny agnostic discounted lanyard while the gravel smothers the rotund fantastic white rum."

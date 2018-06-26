@@ -29,7 +29,7 @@
   ; Return whether the specified character can appear as the second character
   ; or as any later character in a python identifier.
   (let ([regex
-         #px"\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}"])
+         #px"\\p{Mn}|\\p{Mc}|\\p{Nd}|\\p{Pc}"])
          ; See "Lexical analysis" in Python docs. The regex is based on:
          ;     id_continue  ::=  <id_start, categories Mn, Mc, Nd, Pc>
     (lambda (char)
