@@ -8,3 +8,6 @@ build/
 
 # DrRacket artifacts
 **/compiled/
+
+# File used to mark when `make init` has already been run once
+.make-init-ran-already
