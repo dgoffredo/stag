@@ -13,12 +13,34 @@
   ; namespace in the specified schema document (as parsed by the xml module).
   ; If the namespace corresponds to the document's toplevel namespace, then
   ; return the symbol '*toplevel*. If the namespace is not assigned to any
-  ; namespace-related attribute in the schema, then return #f.
+  ; namespace-related attribute in the schema, then return #f. Note that a
+  ; document object starts like this (assuming there are toplevel attributes):
+  ; 
+  ;     (document
+  ;       (prolog
+  ;         ...)
+  ;       (element
+  ;         'xs:schema
+  ;         ...
+  ;         (list ; attributes
+  ;           (attribute
+  ;             (location 2 11 51)
+  ;             (location 2 54 94)
+  ;             'xmlns:xs
+  ;             "http://www.w3.org/2001/XMLSchema")
+  ;           (attribute
+  ;             (location 3 11 106)
+  ;             (location 3 55 150)
+  ;             'targetNamespace
+  ;             "http://www.foo.com/service")
+  ;           (attribute
+  ;             ...
   (let recur ([attributes (~> schema-doc document-element element-attributes)])
     (match attributes
-      ; not found
+      ; not found: The document's toplevel element has no attributes.
       ['() #f]
-      ; a list starting with an attribute whose value is the namespace
+      ; a list starting with an attribute whose value is the namespace.
+      ; The ignored parts (underscores) are source location forms.
       [(cons (attribute _ _ name (== namespace)) remaining)
        (match (string-split (symbol->string name) ":")
          ; no alias -- the attribute sets the schema's toplevel namespace
@@ -64,7 +86,7 @@
       ; If the W3 XSD namespace is the toplevel (global) namespace for the
       ; schema, then there will be attributes like type="string" when what we
       ; need is type="xs:string". Do that transformation.
-      ['*toplevel* (replace-in-attributes schema '|| 'xs)]
+      ['*toplevel* (replace-in-attributes schema #f 'xs)]
 
       ; If the W3 XSD namespace is aliased by some name other than 'xs (say,
       ; 'foo), then there will be attributes like type="foo:int" when what we
@@ -106,9 +128,11 @@
           [attribute-names '(type base)])
   ; Return a copy of the specified SXML schema where any of the specified
   ; attributes have had namespace aliases in their values (if applicable)
-  ; remapped from the specified old alias to the specified new alias.
+  ; remapped from the specified old alias to the specified new alias. #f means
+  ; the absence of a namespace.
+  ;
   ; For example,
-  ;     (replace-in-attributes ... '|| 'xs '(type base))
+  ;     (replace-in-attributes ... #f 'xs '(type base))
   ; would change this
   ;     (xs:element name="foo" type="string")
   ; into this
@@ -122,20 +146,20 @@
          (list name new-value)))))
         
 (define (replace-namespace-alias attribute-value old-alias new-alias)
-  (let ([old-alias (symbol->string old-alias)]
-        [new-alias (symbol->string new-alias)])
+  (let ([old-alias (and old-alias (symbol->string old-alias))]
+        [new-alias (and new-alias (symbol->string new-alias))])
     (match (split-name attribute-value)
       [(list ns local-name)
        (if (equal? ns old-alias)
            (make-name new-alias local-name)
-           (make-name ns local-name))])))
+           (make-name ns        local-name))])))
 
 (define (split-name attribute-value)
   (match (string-split attribute-value ":")
     [(list ns local-name) (list ns local-name)]
-    [(list local-name)    (list "" local-name)]))
+    [(list local-name)    (list #f local-name)]))
 
 (define (make-name ns local-name)
-  (if (equal? ns "")
-    local-name
-    (~a ns ":" local-name)))
+  (if ns
+    (~a ns ":" local-name)
+    local-name))

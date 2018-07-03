@@ -1,8 +1,16 @@
 #lang racket
 
+#| TODO
+
 (require rackunit         ; test-suite, test-case, check-..., etc.
          rackunit/text-ui ; run-tests
-         "private.rkt")   ; the module under test
+         ; modules to test
+         "check-name.rkt"
+         "convert.rkt"
+         "name-map.rkt"
+         "render.rkt"
+         "types.rkt"
+         "python.rkt")
 
 (define tests
   (test-suite
@@ -14,3 +22,5 @@
 
 (module+ test
   (run-tests tests))
+
+|#

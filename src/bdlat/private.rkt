@@ -109,7 +109,7 @@
              scalar-type]
 
             [else (error 
-              (format "Unsupported occurrence: minOccurs=~s maxOccures=~s" 
+              (format "Unsupported occurrence: minOccurs=~e maxOccures=~e" 
                       minOccurs maxOccurs))])))
            
 (define (sxml->bdlat node [type-name #f] [docs '()])

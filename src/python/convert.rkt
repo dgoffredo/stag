@@ -111,11 +111,8 @@
     ; that's how they are in python. Finally there are the "enum" and "other"
     ; cases explained more below.
     (match py-type
-      ['str                          default] ; keep as a string
-      [(list 'typing.Optional 'str)  default] ; keep as a string
-      ['bool                         
-       (~> default capitalize-first string->symbol)]
-      [(list 'typing.Optional 'bool) 
+      [(or 'str (list 'typing.Optional 'str)) default] ; keep as a string
+      [(or 'bool (list 'typing.Optional 'bool))                       
        (~> default capitalize-first string->symbol)]
       ; There are two remaining cases. Either py-type is an enum, and so we
       ; need to look up the attribute name corresponding to the default value,
@@ -133,6 +130,7 @@
                 (? mapped-type? enum-type))
             (string->symbol
               (~a py-type "." (hash-ref name-map (list enum-type default))))]
+
            [_ (string->symbol default)]))])))
 
 (define (bdlat->built-in type)
