@@ -59,12 +59,14 @@
   ; if either procedure is modified, the other might need to be updated as
   ; well.
 
-  (define (maybe-import predicate import-args)
-    ; If the predicate is true for any of the types, return
-    ; (python-import ...). Otherwise return the empty set. This is used
-    ; below to construct a list of imports.
+  (define (maybe-import predicate . import-arg-lists)
+    ; If the predicate is true for any of the types, return 
+    ;     (set (python-import ...) ...)
+    ; Otherwise return the empty set. This is used below to construct a list
+    ; of imports.
     (if (any predicate types)
-      (set (apply python-import import-args))
+      (for/set ([import-args import-arg-lists])
+        (apply python-import import-args))
       (set)))
 
   (define imports
@@ -78,7 +80,8 @@
       (maybe-import (lambda (type) (contains-basic-type? type "duration"))
         '(datetime timedelta))
       (maybe-import bdlat:enumeration? '(enum ()))     ; enum.Enum
-      (maybe-import bdlat:choice? '(gencodeutil ()))   ; gencodeutil.Choice
+      (maybe-import bdlat:choice? '(gencodeutil ())    ; gencodeutil.Choice
+                                  '(typing ()))        ; typing.Union
       (maybe-import contains-array? '(typing ()))      ; typing.List
       (maybe-import bdlat:sequence? '(gencodeutil ())) ; gencodeutil.Sequence
       (maybe-import contains-nullable? '(typing ())))) ; typing.Optional
