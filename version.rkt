@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The green spiritual brisk author observes the green flaky tiny flower while the ice rescues the long-winded symbolic spacious frier.")
+  "The big-boned soaked harsh chair renovates the fishy slim chipper desk while the plank fights the slimey blue big-boned whale.")

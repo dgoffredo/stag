@@ -43,6 +43,7 @@ class Choice:
     attributes to those annotated in the derived class and that keep
     track of which selection is made in the read-only '_selection' property.
     """
+    _selection : str
 
     def __init__(self, **kwarg: Any) -> None:
         if len(kwarg) != 1:
@@ -65,7 +66,7 @@ class Choice:
                                  f'{type(self).__name__} type. Valid '
                                  f'attributes are: {_attr_list(self)}')
 
-        self._selection = attr
+        super().__setattr__('_selection', attr)
         super().__setattr__(attr, value)
 
 
