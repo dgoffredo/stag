@@ -337,12 +337,21 @@
         (list (python-return
           (python-invoke
             'gencodeutil.from_jsonable
-            '(return_type obj _name_mappings)))))
+            '(return_type obj _name_mappings _class_by_name)))))
       ; _name_mappings = { ...
       (python-assignment
         '_name_mappings                                    ; lhs
         (name-map->python-dict name-map types-module-name) ; rhs
-        '()))))                                            ; docs
+        '())                                               ; docs
+      ; _class_by_name = { klass.__name__: klass for klass in _name_mappings }
+      (python-assignment
+        '_class_by_name            ; lhs
+        (python-dict-comprehension ; rhs
+          'klass.__name__  ; key
+          'klass           ; value
+          '(klass)         ; variables
+          '_name_mappings) ; iterator
+        '()))))                    ; docs
 
 (define (bdlat->python-modules
           types

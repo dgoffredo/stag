@@ -145,7 +145,9 @@
          [recur   (lambda (form [indent-level indent-level])
                     (render-python form indent-level indent-spaces))]
          ; Recurse into this procedure with indent-level incremented.
-         [recur+1 (lambda (form) (recur form (+ indent-level 1)))])
+         [recur+1 (lambda (form) (recur form (+ indent-level 1)))]
+         ; Bind indent-level and indent-spaces to csv. Note the shadowing.
+         [csv     (lambda (form) (csv form indent-level indent-spaces))])
     (match form
       [(python-module description docs imports statements)
        ; """This is the description.
@@ -200,7 +202,7 @@
        ;     """
        ;     ...
        (~a INDENT "class " name
-         (let ([bases-text (csv bases indent-level indent-spaces)])
+         (let ([bases-text (csv bases)])
            (if (= (string-length bases-text) 0)
              ""
              (~a "(" bases-text ")")))
@@ -244,7 +246,7 @@
       [(python-def name args type docs body)
        ; def name(arg1, arg2):
        ;     body...
-       (~a INDENT "def " name "(" (csv args indent-level indent-spaces) ")"
+       (~a INDENT "def " name "(" (csv args) ")"
          (if (equal? type '#:omit) 
            "" 
            (~a " -> " (format-type type indent-level indent-spaces))) ":\n"
@@ -255,7 +257,7 @@
          "\n")]
 
       [(python-invoke name args)
-       (~a INDENT name "(" (csv args indent-level indent-spaces) ")")]
+       (~a INDENT name "(" (csv args) ")")]
 
       [(python-dict items)
        ; {key1: value1, ...}
@@ -273,9 +275,13 @@
        (~a INDENT "return " (recur expression))]
 
       [(python-for variables iterator body)
-       (~a INDENT "for " (csv variables indent-level indent-spaces)
-         " in " (recur iterator) ":\n"
+       (~a INDENT "for " (csv variables) " in " (recur iterator) ":\n"
          (string-join (map recur+1 body) ""))]
+
+      [(python-dict-comprehension key value variables iterator)
+       (~a "{" (recur key) ": " (recur value)
+         " for " (csv variables) " in " (recur iterator)
+         "}")]
 
       [(? symbol? value)
        ; Symbols are here notable in that they're printed with ~a, not ~s.

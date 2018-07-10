@@ -79,11 +79,12 @@ class NameMapping:
 
     def __init__(self, py_to_schema: Mapping[str, str]) -> None:
         self.py_to_schema = py_to_schema
-        # TODO: Detect duplicates.
         self.schema_to_py = {
             value: name
             for name, value in py_to_schema.items()
         }
+        # no duplicates
+        assert len(self.schema_to_py) == len(self.py_to_schema)
 
 
 def to_jsonable(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
@@ -218,11 +219,24 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
 
 def from_jsonable(return_type: Any, 
                   obj: Any,
-                  name_mappings: Mapping[type, NameMapping]) -> Any:
+                  name_mappings: Mapping[type, NameMapping],
+                  class_by_name: Mapping[str, type]) -> Any:
     # Note that while this function is annotated as returning any type, it in
     # fact returns a value having the specified 'return_type'.
     # TODO Need to handle blobs (and possibly other XSD types)
-    if issubclass(return_type, (str, int, float)):
+
+    # This case needs to be checked first, because if 'return_type' is a
+    # 'typing.Union' (e.g. 'typing.Optional'), then it's not really a type,
+    # and so the 'issubclass' checks will fail below. Strangely this is not
+    # true for 'typing.List', which behaves like a type.
+    if repr(return_type.__class__) == 'typing.Union':
+        # 'typing.Union[..., None]' comes from 'typing.Optional[...]'.
+        type_args = return_type.__args__
+        assert len(type_args) == 2
+        assert type(None) in type_args
+        inner_type = [t for t in type_args if t is not type(None)][0]
+        return from_jsonable(inner_type, obj, name_mappings, class_by_name)
+    elif issubclass(return_type, (str, int, float)):
         return return_type(obj)
     elif issubclass(return_type, 
                     (datetime.datetime, datetime.date, datetime.time)):
@@ -240,7 +254,8 @@ def from_jsonable(return_type: Any,
         return return_type[name_mappings[return_type].schema_to_py[obj.name]]
     elif issubclass(return_type, list):
         elem_type, = return_type.__args__
-        return [from_jsonable(elem_type, elem, name_mappings) for elem in obj]
+        return [from_jsonable(elem_type, elem, name_mappings, class_by_name) \
+                for elem in obj]
     else:
         # Assume that 'return_type' is derived from either 'Sequence' or
         # 'Choice', so that we can just invoke its constructor with keyword
@@ -251,6 +266,15 @@ def from_jsonable(return_type: Any,
         attr_values = {}
         for elem, value in obj.items():
             attr = schema_to_py[elem]
-            elem_type = return_type.__annotations__[attr]
-            attr_values[attr] = from_jsonable(elem_type, value, name_mappings)
+            elem_annotation = return_type.__annotations__[attr]
+            # If the element annotation spelled its type as a str, then it's a
+            # forward declared type. Look up the actual class in class_by_name.
+            if isinstance(elem_annotation, str):
+                elem_type = class_by_name[elem_annotation]
+            else:
+                elem_type = elem_annotation
+
+            attr_values[attr] = from_jsonable(
+                elem_type, value, name_mappings, class_by_name)
+
         return return_type(**attr_values)

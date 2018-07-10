@@ -71,6 +71,13 @@
    body)     ; list of statements
   #:transparent)
 
+(struct python-dict-comprehension
+  (key       ; expression
+   value     ; expression
+   variables ; list of symbols
+   iterator) ; expression
+  #:transparent)
+
 (define (annotation->argument annotation)
   ; A python-argument is just a python-annotation without the "docs" field, so
   ; it can be convenient to convert an annotation into an argument, such as
