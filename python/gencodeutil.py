@@ -43,7 +43,7 @@ class Choice:
     attributes to those annotated in the derived class and that keep
     track of which selection is made in the read-only '_selection' property.
     """
-    _selection : str
+    _selection: str
 
     def __init__(self, **kwarg: Any) -> None:
         if len(kwarg) != 1:
@@ -108,7 +108,8 @@ def to_jsonable(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
     else:
         if not isinstance(obj, Sequence):
             raise ValueError(
-                f'Unable to to_jsonable object with unsupported type {type(obj)}.')
+                f'Unable to to_jsonable object with unsupported type {type(obj)}.'
+            )
         return {
             elem: to_jsonable(getattr(obj, attr), name_mappings) \
             for attr, elem in name_mappings[type(obj)].py_to_schema.items() \
@@ -116,9 +117,8 @@ def to_jsonable(obj: Any, name_mappings: Mapping[type, NameMapping]) -> Any:
         }
 
 
-def _parse_interval(hours : str,
-                    minutes : Optional[str], 
-                    seconds : Optional[str]) -> Tuple[int, int, int, int, int]:
+def _parse_interval(hours: str, minutes: Optional[str],
+                    seconds: Optional[str]) -> Tuple[int, int, int, int, int]:
     """Return (hours, minutes, seconds, milliseconds, microseconds) from
     the specified timestamp parts, where the input arguments 'hours' and
     'minutes' are formatted as integers, while the input argument 'seconds' may
@@ -131,15 +131,12 @@ def _parse_interval(hours : str,
     milliseconds = int(milliseconds_dec)
     microseconds = int((milliseconds_dec - milliseconds) * 1000)
 
-    return (int(hours), 
-            int(minutes or 0), 
-            return_seconds, 
-            milliseconds, 
+    return (int(hours), int(minutes or 0), return_seconds, milliseconds,
             microseconds)
 
-def _parse_iso8601(isoformat : str) -> Union[datetime.date,
-                                             datetime.time, 
-                                             datetime.datetime]:
+
+def _parse_iso8601(isoformat: str
+                   ) -> Union[datetime.date, datetime.time, datetime.datetime]:
     """Return an object parsed from the specified 'isoformat', which must be
     an ISO-8601 compatible date, time, or datetime, with the exception that
     none of week numbers, ordinal dates, nor dates without a year are
@@ -148,16 +145,16 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
     "12:34:18.332" yields a 'datetime.time', and "2016-01-01T08:54:33Z"
     yields a 'datetime.datetime'.
     """
-    date_pattern = fr'(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)'
-    time_pattern = (fr'(?P<hour>\d\d):'
-                    fr'(?P<minute>\d\d):'
-                    fr'(?P<second>\d\d(\.\d+)?)')
-    zulu_pattern = fr'(?P<zulu>Z)'
-    offset_pattern = (fr'(?P<offset_sign>[-+])(?P<offset_hours>\d\d)(:?'
-                      fr'(?P<offset_minutes>\d\d)(:?'
-                      fr'(?P<offset_seconds>\d\d(\.\d+)?))?)?')
-    zone_pattern = fr'{zulu_pattern}|{offset_pattern}'
-    pattern = fr'^({date_pattern})?[T ]?({time_pattern})?({zone_pattern})?$'
+    date_pattern = r'(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)'
+    time_pattern = (r'(?P<hour>\d\d):'
+                    r'(?P<minute>\d\d):'
+                    r'(?P<second>\d\d(\.\d+)?)')
+    zulu_pattern = r'(?P<zulu>Z)'
+    offset_pattern = (r'(?P<offset_sign>[-+])(?P<offset_hours>\d\d)(:?'
+                      r'(?P<offset_minutes>\d\d)(:?'
+                      r'(?P<offset_seconds>\d\d(\.\d+)?))?)?')
+    zone_pattern = f'{zulu_pattern}|{offset_pattern}'
+    pattern = f'^({date_pattern})?[T ]?({time_pattern})?({zone_pattern})?$'
 
     match = re.match(pattern, isoformat)
     if not match:
@@ -170,55 +167,44 @@ def _parse_iso8601(isoformat : str) -> Union[datetime.date,
         tzinfo = datetime.timezone.utc
     elif groups['offset_sign'] is not None:
         hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
-            groups['offset_hours'], 
-            groups['offset_minutes'], 
+            groups['offset_hours'], groups['offset_minutes'],
             groups['offset_seconds'])
 
         sign = {'-': -1, '+': +1}[groups['offset_sign']]
-        
-        tzinfo = datetime.timezone(
-            sign * datetime.timedelta(seconds=seconds, 
-                                      microseconds=microseconds,
-                                      milliseconds=milliseconds, 
-                                      minutes=minutes, 
-                                      hours=hours))
+
+        tzinfo = datetime.timezone(sign * datetime.timedelta(
+            seconds=seconds,
+            microseconds=microseconds,
+            milliseconds=milliseconds,
+            minutes=minutes,
+            hours=hours))
 
     if groups['year'] is None:
         # It's just a time.
         hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
-            groups['hour'], 
-            groups['minute'], 
-            groups['second'])
+            groups['hour'], groups['minute'], groups['second'])
 
-        return datetime.time(hour=hours, 
-                             minute=minutes, 
-                             second=seconds, 
-                             microsecond=(microseconds + 1000 * milliseconds), 
-                             tzinfo=tzinfo)
+        return datetime.time(
+            hour=hours,
+            minute=minutes,
+            second=seconds,
+            microsecond=(microseconds + 1000 * milliseconds),
+            tzinfo=tzinfo)
     elif groups['hour'] is None:
         # It's just a date. Note that time zone information is ignored.
-        return datetime.date(int(groups['year']), 
-                             int(groups['month']), 
-                             int(groups['day']))
-    
+        return datetime.date(
+            int(groups['year']), int(groups['month']), int(groups['day']))
+
     # Otherwise, it's a datetime.
     hours, minutes, seconds, milliseconds, microseconds = _parse_interval(
-        groups['hour'], 
-        groups['minute'], 
-        groups['second'])
+        groups['hour'], groups['minute'], groups['second'])
 
-    return datetime.datetime(int(groups['year']), 
-                             int(groups['month']), 
-                             int(groups['day']),
-                             hours,
-                             minutes,
-                             seconds,
-                             microseconds + 1000 * milliseconds,
-                             tzinfo)
-    
+    return datetime.datetime(
+        int(groups['year']), int(groups['month']), int(groups['day']), hours,
+        minutes, seconds, microseconds + 1000 * milliseconds, tzinfo)
 
-def from_jsonable(return_type: Any, 
-                  obj: Any,
+
+def from_jsonable(return_type: Any, obj: Any,
                   name_mappings: Mapping[type, NameMapping],
                   class_by_name: Mapping[str, type]) -> Any:
     # Note that while this function is annotated as returning any type, it in
@@ -238,7 +224,7 @@ def from_jsonable(return_type: Any,
         return from_jsonable(inner_type, obj, name_mappings, class_by_name)
     elif issubclass(return_type, (str, int, float)):
         return return_type(obj)
-    elif issubclass(return_type, 
+    elif issubclass(return_type,
                     (datetime.datetime, datetime.date, datetime.time)):
         if not isinstance(obj, str):
             raise ValueError(
@@ -274,7 +260,7 @@ def from_jsonable(return_type: Any,
             else:
                 elem_type = elem_annotation
 
-            attr_values[attr] = from_jsonable(
-                elem_type, value, name_mappings, class_by_name)
+            attr_values[attr] = from_jsonable(elem_type, value, name_mappings,
+                                              class_by_name)
 
         return return_type(**attr_values)

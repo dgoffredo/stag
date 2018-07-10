@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The dull funny friendly duck educates the fantastic fuzzy moist cleaver while the horse evicerates the conservative fried silly noon.")
+  "The marginal enthusiastic brisk assembly fries the flaky excessive fuzzy crust while the cabinet incinerates the wild fuzzy spacious hamster.")
