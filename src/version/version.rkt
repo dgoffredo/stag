@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The tiny sunken funny constable overrides the tiny agnostic discounted lanyard while the gravel smothers the rotund fantastic white rum.")
+  "The short-sighted blue haggard badger stupefies the spacious flaky new champion while the asphalt melts the fried dull spacious treasure.")
