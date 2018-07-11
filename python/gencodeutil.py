@@ -204,6 +204,12 @@ def _parse_iso8601(isoformat: str
         minutes, seconds, microseconds + 1000 * milliseconds, tzinfo)
 
 
+def _expect_isinstance(obj: Any, klass: type, return_type: Any) -> None:
+    if not isinstance(obj, klass):
+        raise ValueError(
+            f'Unable to parse a {return_type} from a {type(obj)}.')
+
+
 def from_jsonable(return_type: Any, obj: Any,
                   name_mappings: Mapping[type, NameMapping],
                   class_by_name: Mapping[str, type]) -> Any:
@@ -226,9 +232,7 @@ def from_jsonable(return_type: Any, obj: Any,
         return return_type(obj)
     elif issubclass(return_type,
                     (datetime.datetime, datetime.date, datetime.time)):
-        if not isinstance(obj, str):
-            raise ValueError(
-                f'Unable to parse a {return_type} from a {type(object)}.')
+        _expect_isinstance(obj, str, return_type)
         result = _parse_iso8601(obj)
         if not isinstance(result, return_type):
             raise ValueError(f'Expected a {return_type} but parsed a '
@@ -237,7 +241,8 @@ def from_jsonable(return_type: Any, obj: Any,
     elif issubclass(return_type, datetime.timedelta):
         raise NotImplementedError('Time intervals are not supported.')
     elif issubclass(return_type, Enum):
-        return return_type[name_mappings[return_type].schema_to_py[obj.name]]
+        _expect_isinstance(obj, str, return_type)
+        return return_type[name_mappings[return_type].schema_to_py[obj]]
     elif issubclass(return_type, list):
         elem_type, = return_type.__args__
         return [from_jsonable(elem_type, elem, name_mappings, class_by_name) \

@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The marginal enthusiastic brisk assembly fries the flaky excessive fuzzy crust while the cabinet incinerates the wild fuzzy spacious hamster.")
+  "The discounted ecumenical rotund skunk throws the excessive happy massive badger while the horse punches the discounted chipper wild air.")
