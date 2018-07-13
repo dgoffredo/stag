@@ -24,43 +24,45 @@ def from_jsonable(return_type: typing.Any, obj: typing.Any) -> typing.Any:
 
 
 _name_mappings = {
-    balbermsg.Color:
+    balbermsg.SomeChoice:
     gencodeutil.NameMapping({
-        "BLUE": "BLUE",
-        "GREEN": "GREEN",
-        "RED": "RED",
-        "CRAZY_WACKY_COLOR": "crazy-WACKYColor"
+        "bar": "bar",
+        "foo": "foo",
+        "boo": "boo",
+        "baz": "baz"
     }),
+    balbermsg.ThisOneHasAFunnyName:
+    gencodeutil.NameMapping({}),
     balbermsg.BerDecoderOptions:
     gencodeutil.NameMapping({
-        "max_depth": "MaxDepth",
-        "trace_level": "TraceLevel",
+        "max_sequence_size": "MaxSequenceSize",
         "skip_unknown_elements": "SkipUnknownElements",
-        "max_sequence_size": "MaxSequenceSize"
+        "trace_level": "TraceLevel",
+        "max_depth": "MaxDepth"
+    }),
+    balbermsg.Color:
+    gencodeutil.NameMapping({
+        "CRAZY_WACKY_COLOR": "crazy-WACKYColor",
+        "RED": "RED",
+        "GREEN": "GREEN",
+        "BLUE": "BLUE"
     }),
     balbermsg.BerEncoderOptions:
     gencodeutil.NameMapping({
-        "encode_empty_arrays":
-        "EncodeEmptyArrays",
-        "trace_level":
-        "TraceLevel",
-        "color":
-        "color",
-        "datetime_fractional_second_precision":
-        "DatetimeFractionalSecondPrecision",
-        "thing":
-        "thing",
+        "bde_version_conformance":
+        "BdeVersionConformance",
         "encode_date_and_time_types_as_binary":
         "EncodeDateAndTimeTypesAsBinary",
-        "bde_version_conformance":
-        "BdeVersionConformance"
-    }),
-    balbermsg.SomeChoice:
-    gencodeutil.NameMapping({
-        "baz": "baz",
-        "boo": "boo",
-        "foo": "foo",
-        "bar": "bar"
+        "thing":
+        "thing",
+        "datetime_fractional_second_precision":
+        "DatetimeFractionalSecondPrecision",
+        "color":
+        "color",
+        "trace_level":
+        "TraceLevel",
+        "encode_empty_arrays":
+        "EncodeEmptyArrays"
     })
 }
 
@@ -69,4 +71,4 @@ _class_by_name = {klass.__name__: klass for klass in _name_mappings}
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The tiny sunken funny constable overrides the tiny agnostic discounted lanyard while the gravel smothers the rotund fantastic white rum."
+_code_generator_version = "The short-sighted blue haggard badger stupefies the spacious flaky new champion while the asphalt melts the fried dull spacious treasure."

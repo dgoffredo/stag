@@ -15,35 +15,59 @@
   ; at the key.
   (hash-set! table key (cons value (hash-ref table key '()))))
 
+(define (name-map-by-class name-map)
+  ; Return a hash table that is the specified hash table grouped by class name.
+  ; 'name-map' has the following structure:
+  ;
+  ;     (hash 'someType 'SomeClass
+  ;           '(someType someElement) 'some_attribute
+  ;           ...)
+  ;
+  ; while the return value of this procedure would have the following
+  ; structure:
+  ;
+  ;     (hash 'SomeClass '(("some_attribute" someElement) ...)
+  ;           ...)
+  (let ([by-class (make-hash)])
+    (for ([(key value) name-map])
+      (match key
+        ; The key maps some Type.element to a python attribute name. Add a pair
+        ; (attribute_name . elementName) to the list at the class name. If
+        ; there's no entry yet, start with an empty list.
+        [(list type element)
+         (hash-update! by-class (hash-ref name-map type)
+           (lambda (pairs)
+             (cons (cons (symbol->string value) element)
+                   pairs))
+           '())]
+
+        ; The key maps some type name to a class name. Make sure there's an
+        ; entry for this class if there isn't. Start with an empty list.
+        [type
+         (hash-update! by-class (hash-ref name-map type) identity '())]))
+
+    by-class))
+
 (define (name-map->python-dict name-map types-module-name)
   ; Return a python-dict of name mappings suitable for inclusion in the util
-  ; module to be produced.
-  (let ([by-type (make-hash)])
-    ; Build up by-type :: {'type: '(("py_attr" . "bdlatAttr") ...)}.
-    (hash-for-each name-map
-      (lambda (key value)
-        (match key
-          ; Use the keys that refer to an attribute within a type.
-          [(list type bdlat-attribute)
-           (hash-value-prepend!
-             by-type
-             (hash-ref name-map type)
-             (cons (symbol->string value) bdlat-attribute))]
-          ; Ignore the keys that are just class names.
-          [_ (void)])))
-
-    ; Build up the dict using by-type.
-    (python-dict
-      (hash-map
-        by-type
-        (lambda (key pairs)
-          (cons
-            ; the outer dict key, e.g. messages.Type
-            (string->symbol (~a types-module-name "." key))
-            ; the outer dict's value, e.g. gencodeutil.NameMapping({...})
-            (python-invoke
-              'gencodeutil.NameMapping
-              (list (python-dict pairs)))))))))
+  ; module to be produced, e.g.
+  ;
+  ;     { 
+  ;         foosvcmsg.Foo: gencodeutil.NameMapping({
+  ;             "attribute_name": "elementName"
+  ;             ...
+  ;         })
+  ;         ...
+  ;     }
+  (python-dict
+    (for/list ([(key pairs) (name-map-by-class name-map)])
+      (cons
+        ; the outer dict key, e.g. messages.Type
+        (string->symbol (~a types-module-name "." key))
+        ; the outer dict's value, e.g. gencodeutil.NameMapping({...})
+        (python-invoke
+          'gencodeutil.NameMapping
+          (list (python-dict pairs)))))))
 
 (define (merge-overrides! name-map overrides)
   ; Apply overrides to name-map and return name-map modified in place. The

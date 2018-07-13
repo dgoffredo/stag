@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The short-sighted blue haggard badger stupefies the spacious flaky new champion while the asphalt melts the fried dull spacious treasure.")
+  "The fantastic brazen dull chair rescues the slimey black sorry pear while the lanyard stupefies the brisk fuzzy spacious manager.")

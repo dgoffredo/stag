@@ -58,7 +58,7 @@
   #:transparent)
 
 (struct python-dict
-  (items) ; list of pair (key, value)
+  (items) ; list of pair (key . value)
   #:transparent)
 
 (struct python-return
