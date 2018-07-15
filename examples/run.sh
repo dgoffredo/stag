@@ -23,8 +23,8 @@ run_checked() {
 # Deduce where the stag root is based on where this script is assumed to be.
 REPO=$(readlink -f $(dirname $BASH_SOURCE)/../)
 
-# Go into the scratch/ directory and run stag on the schema. 
-run_checked cd $REPO/scratch
+# Go into the examples/ directory and run stag on the schema. 
+run_checked cd $REPO/examples
 run_checked racket $REPO/src/stag/stag.rkt "$@" $library.xsd
 
 # Stag will have produced these three python modules.

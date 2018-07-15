@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The sharp black maroon hamster kicks the spiritual agnostic clinical staple while the cat paints the fuzzy flagrant purple pot.")
+  "The rotund sharp ecumenical programmer throws the clinical funny silly pot while the lisp assists the haggard angry brazen flower.")
