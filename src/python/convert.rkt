@@ -6,6 +6,7 @@
          "types.rkt"                             ; python AST structs
          "name-map.rkt"                          ; schema names -> python names
          "check-name.rkt"                        ; valid python identifiers
+         "readers.rkt"                           ; include/string macro
          threading                               ; ~> and ~>> macros
          srfi/1)                                 ; list procedures (e.g. any)
 
@@ -50,7 +51,7 @@
         [(bdlat:basic type)            (equal? type matching-case)]
         [_                             #f])))
 
-(define (bdlat->imports types)
+(define (bdlat->imports types private-module-name)
   ; Deduce from the specified bdlat types which python modules a module
   ; defining those types must import.
   ; e.g. if there are any "sequence" types, then gencodeutil will have to be
@@ -58,6 +59,8 @@
   ; contains information about which bdlat basic types map to python types, so
   ; if either procedure is modified, the other might need to be updated as
   ; well.
+  ; Additionally, import the specicified private module aliased as
+  ; "gencodeutil" for use elsewhere in the python module being generated.
 
   (define (maybe-import predicate . import-arg-lists)
     ; If the predicate is true for any of the types, return 
@@ -71,6 +74,9 @@
 
   (define imports
     (set-union
+      (set 
+        (python-import-alias (string->symbol private-module-name)
+                             'gencodeutil))
       (maybe-import (lambda (type) (contains-basic-type? type "date"))
         '(datetime date))
       (maybe-import (lambda (type) (contains-basic-type? type "time"))
@@ -80,17 +86,17 @@
       (maybe-import (lambda (type) (contains-basic-type? type "duration"))
         '(datetime timedelta))
       (maybe-import bdlat:enumeration? '(enum ()))     ; enum.Enum
-      (maybe-import bdlat:choice? '(gencodeutil ())    ; gencodeutil.Choice
-                                  '(typing ()))        ; typing.Union
+      (maybe-import bdlat:choice? '(typing ()))        ; typing.Union
       (maybe-import contains-array? '(typing ()))      ; typing.List
-      (maybe-import bdlat:sequence? '(gencodeutil ())) ; gencodeutil.Sequence
       (maybe-import contains-nullable? '(typing ())))) ; typing.Optional
 
   ; Return a list of the import statements sorted by module name. This isn't
   ; PEP8 conformant, but what a pain that would be.
   (~> imports 
       set->list 
-      (sort symbol<? #:key (match-lambda [(python-import from _) from]))))
+      (sort symbol<? 
+        #:key (match-lambda [(python-import from _) from]
+                            [(python-import-alias from _) from]))))
 
 (define *default-types-module-description*
   "Provide typed attribute classes.")
@@ -276,15 +282,17 @@
                 (enumeration-value->assignment value name name-map))
            values)))]))
 
-(define (bdlat->types-module types name-map description docs)
+(define (bdlat->types-module 
+          types name-map private-module-name description docs)
   (python-module
     description
     docs
-    (bdlat->imports types)
+    (bdlat->imports types private-module-name)
     ; The body of the module is a list of class definitions derived from types.
     (map 
       (lambda (type) (bdlat->class type name-map))
-      ; sort the types: enum < non-enum 
+      ; sort the types: enum < non-enum (because enum values can appear as
+      ; attribute defaults, so their definitions have to be first).
       (sort 
         types 
         (match-lambda* 
@@ -293,7 +301,7 @@
             #t]
           [_ #f])))))
 
-(define (util-module types-module-name name-map)
+(define (util-module types-module-name private-module-name name-map)
   (python-module
     ; description
     (~a "Provide codecs for types defined in " types-module-name ".")
@@ -301,7 +309,8 @@
     '() ; TODO: usage examples
     ; imports
     (list (python-import (string->symbol types-module-name) '())
-          (python-import 'gencodeutil '())
+          (python-import-alias 
+            (string->symbol private-module-name) 'gencodeutil)
           (python-import 'typing '()))
     ; statements (body)
     (list
@@ -353,9 +362,13 @@
           '_name_mappings) ; iterator
         '()))))                    ; docs
 
+(define (private-module)
+  (python-rendered-module (include/string "gencodeutil.py")))
+
 (define (bdlat->python-modules
           types
           types-module-name
+          private-module-name
           #:overrides [overrides '()]
           #:description [description *default-types-module-description*]
           #:docs [docs *default-types-module-docs*])
@@ -367,7 +380,10 @@
       (bdlat->types-module
         types
         name-map
+        private-module-name
         description
         docs)
       ; the util module
-      (util-module types-module-name name-map))))
+      (util-module types-module-name private-module-name name-map)
+      ; the private module
+      (private-module))))

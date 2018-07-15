@@ -12,6 +12,7 @@
       verbose 
       types-module 
       util-module 
+      private-module
       extensions-namespace 
       name-overrides 
       output-directory 
@@ -21,14 +22,13 @@
            [modules (bdlat->python-modules 
                       types
                       types-module
+                      private-module
                       #:overrides name-overrides)])
-      (for-each
-        (lambda (py-module module-name)
-          (let* ([file-name (~a module-name ".py")]
-                 [output-path (build-path output-directory file-name)]
-                 [output-port (open-output-file 
-                                output-path 
-                                #:exists 'truncate)])
-            (display (render-python py-module) output-port)))
-        modules
-        (list types-module util-module)))])
+      (for ([py-module modules]
+            [module-name (list types-module util-module private-module)])
+        (let* ([file-name (~a module-name ".py")]
+               [output-path (build-path output-directory file-name)]
+               [output-port (open-output-file 
+                              output-path 
+                              #:exists 'truncate)])
+          (display (render-python py-module) output-port))))])

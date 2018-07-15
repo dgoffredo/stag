@@ -55,6 +55,7 @@ functions (`foosvcmsgutil.py`).
 | `--output-directory <path>`   | output directory -- defaults to `$PWD`      |
 | `--types-module <name>`       | name of module containing types             |
 | `--util-module <name>`        | name of module containing utilities         |
+| `--private-module <name>`     | name of module containing private details   |
 | `--extensions-namespace <ns>` | XML namespace where extensions are defined  |
 | `--name-overrides <list>`     | generated identifiers. See "Name Overrides."|
 

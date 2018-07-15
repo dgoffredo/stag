@@ -6,11 +6,11 @@ Instances of the types defined in this module are immutable, and may be
 converted to and from JSON-compatible objects using the similarly-named
 utilities module that is dual to this module.
 """
+import _balbermsg as gencodeutil
 from datetime import time
 from datetime import date
 from datetime import datetime
 import enum
-import gencodeutil
 import typing
 
 
@@ -110,4 +110,4 @@ class ThisOneHasAFunnyName(gencodeutil.Sequence):
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The short-sighted blue haggard badger stupefies the spacious flaky new champion while the asphalt melts the fried dull spacious treasure."
+_code_generator_version = "The fantastic brazen dull chair rescues the slimey black sorry pear while the lanyard stupefies the brisk fuzzy spacious manager."

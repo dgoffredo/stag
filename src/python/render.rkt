@@ -174,6 +174,13 @@
          ; code generator version variable
          "\n\n" (render-version indent-level indent-spaces))]
 
+      [(python-rendered-module source-code)
+       (~a
+         ; This python code is already rendered, so just print it verbatim.
+         source-code
+         ; code generator version variable
+         "\n\n" (render-version indent-level indent-spaces))]
+
       [(python-import from-module names)
        ; can be one of
        ;     import something
@@ -194,6 +201,10 @@
                  (~a INDENT "from " from-module " import " name))
                names)
              "\n")])]
+
+      [(python-import-alias module-name alias)
+       ; import something as somethingelse
+       (~a "import " module-name " as " alias "\n")]
 
       [(python-class name bases docs statements)
        ; class Name(Base1, Base2):

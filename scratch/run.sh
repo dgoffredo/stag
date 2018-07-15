@@ -27,8 +27,8 @@ REPO=$(readlink -f $(dirname $BASH_SOURCE)/../)
 run_checked cd $REPO/scratch
 run_checked racket $REPO/src/stag/stag.rkt "$@" $library.xsd
 
-# Stag will have produced these two python modules.
-FILES="${library}msg.py ${library}msgutil.py"
+# Stag will have produced these three python modules.
+FILES="${library}msg.py ${library}msgutil.py _${library}msg.py"
 
 # Format the python code in place.
 for module in $FILES; do

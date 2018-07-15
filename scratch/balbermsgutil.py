@@ -2,7 +2,7 @@
 
 """
 import balbermsg
-import gencodeutil
+import _balbermsg as gencodeutil
 import typing
 
 
@@ -33,13 +33,6 @@ _name_mappings = {
     }),
     balbermsg.ThisOneHasAFunnyName:
     gencodeutil.NameMapping({}),
-    balbermsg.BerDecoderOptions:
-    gencodeutil.NameMapping({
-        "max_sequence_size": "MaxSequenceSize",
-        "skip_unknown_elements": "SkipUnknownElements",
-        "trace_level": "TraceLevel",
-        "max_depth": "MaxDepth"
-    }),
     balbermsg.Color:
     gencodeutil.NameMapping({
         "CRAZY_WACKY_COLOR": "crazy-WACKYColor",
@@ -47,8 +40,19 @@ _name_mappings = {
         "GREEN": "GREEN",
         "BLUE": "BLUE"
     }),
+    balbermsg.BerDecoderOptions:
+    gencodeutil.NameMapping({
+        "max_sequence_size": "MaxSequenceSize",
+        "skip_unknown_elements": "SkipUnknownElements",
+        "trace_level": "TraceLevel",
+        "max_depth": "MaxDepth"
+    }),
     balbermsg.BerEncoderOptions:
     gencodeutil.NameMapping({
+        "color":
+        "color",
+        "trace_level":
+        "TraceLevel",
         "bde_version_conformance":
         "BdeVersionConformance",
         "encode_date_and_time_types_as_binary":
@@ -57,10 +61,6 @@ _name_mappings = {
         "thing",
         "datetime_fractional_second_precision":
         "DatetimeFractionalSecondPrecision",
-        "color":
-        "color",
-        "trace_level":
-        "TraceLevel",
         "encode_empty_arrays":
         "EncodeEmptyArrays"
     })
@@ -71,4 +71,4 @@ _class_by_name = {klass.__name__: klass for klass in _name_mappings}
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The short-sighted blue haggard badger stupefies the spacious flaky new champion while the asphalt melts the fried dull spacious treasure."
+_code_generator_version = "The fantastic brazen dull chair rescues the slimey black sorry pear while the lanyard stupefies the brisk fuzzy spacious manager."

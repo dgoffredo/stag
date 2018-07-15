@@ -6,6 +6,7 @@
 (struct options (verbose              ; #t -> print verbose diagnostics
                  types-module         ; e.g. "foosvcmsg"
                  util-module          ; e.g. "foosvcmsgutil"
+                 private-module       ; e.g. "_foosvcmsg"
                  extensions-namespace ; e.g. for <element>'s "id" attribute
                  name-overrides       ; e.g. ([before after] ...)
                  output-directory     ; path to directory for output files
@@ -25,6 +26,7 @@
   (define verbose (make-parameter #f))
   (define types-module (make-parameter #f))
   (define util-module  (make-parameter #f))
+  (define private-module  (make-parameter #f))
   (define extensions-namespace 
     (make-parameter "http://bloomberg.com/schemas/bdem"))
   (define name-overrides (make-parameter '()))
@@ -42,6 +44,9 @@
       [("--util-module") UTIL-MODULE
                           "Set the name of the util module"
                           (util-module UTIL-MODULE)]
+      [("--private-module") PRIVATE-MODULE
+                          "Set the name of the private module"
+                          (private-module PRIVATE-MODULE)]
       [("--extensions-namespace") EXTENSIONS-NAMESPACE
                                   "Set XSD extensions XML namespace"
                                   (extensions-namespace EXTENSIONS-NAMESPACE)]
@@ -61,14 +66,19 @@
     (or (types-module) 
       (string-append (name-without-extension schema-path-string) "msg")))
 
-  ; Dervice util-module from types-module* (if necessary).
+  ; Derive util-module from types-module* (if necessary).
   (define util-module*
     (or (util-module) (string-append types-module* "util")))
+
+  ; Derive private-module from types-module* (if necessary).
+  (define private-module*
+    (or (private-module) (string-append "_" types-module*)))
 
   ; Return an options struct
   (options (verbose)
            types-module*
            util-module*
+           private-module*
            (extensions-namespace)
            (name-overrides)
            (output-directory)

@@ -9,9 +9,18 @@
    statements) ; list of any of python-class, python-assignment, etc.
   #:transparent)
 
+(struct python-rendered-module
+  (source-code) ; string
+  #:transparent)
+
 (struct python-import
   (from-module ; symbol
    symbols)    ; a list of symbols or a single symbol
+  #:transparent)
+
+(struct python-import-alias
+  (module-name ; symbol
+   alias)      ; symbol
   #:transparent)
 
 (struct python-class
