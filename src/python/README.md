@@ -12,12 +12,15 @@ python's abstract syntax tree, and also two procedures:
 
 The first procedure, `bdlat->python-modules`, takes a list of type
 definitions from the `bdlat` module, such as `bdlat-sequence` and
-`bdlat-enumeration`, and returns a list containing two `python-module`
+`bdlat-enumeration`, and returns a list containing three `python-module`
 objects. The first `python-module` object contains `class` definitions
 compiled from the `bdlat` types. The second `python-module` object contains
 "jsonable" encoding and decoding functions that act on instances of any of
 the generated classes, and also contains some implementation details (the
-mapping from names in python to names in the schema).
+mapping from names in python to names in the schema). The third `python-module`
+object contains the definitions of base classes and functions used by any
+generated code, but is included separately to avoid the administration problem
+that could be caused by dependency on a generator-specific python library.
 
 The other procedure exported by [python.rkt](python.rkt) is `render-python`.
 `render-python` takes an instance of any of the `python-`-prefixed `struct`s
@@ -183,7 +186,8 @@ into the following two Python ASTs:
     '()))))
 ```
 
-and then into the following two Python modules:
+and then into the following two Python modules (plus a third being the
+"private" module, whose content is independent of the two ASTs):
 
 ```python
 """Provide typed attribute classes.

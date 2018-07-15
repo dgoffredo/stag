@@ -29,10 +29,11 @@ OTAS, and it is not known whether immunity is acquired or hereditary.
 What
 ----
 `stag` is a Racket program that, given an XML Schema Definition (XSD) file,
-generates two python modules: one containing python classes corresponding to
-the types defined in the schema, and another of utilities for converting
+generates three python modules: one containing python classes corresponding
+to the types defined in the schema, another of utilities for converting
 instances of the generated classes to and from JSON-compatible compositions
-of standard python objects, such as `dict` and `list`.
+of standard python objects, such as `dict` and `list`, and a final module of
+private implementation details.
 
 How
 ---
@@ -40,12 +41,14 @@ Invoke `stag` as a command line tool:
 
     $ ./stag foosvcmsg.xsd
     $ ls
-    foosvcmsg.py    foosvcmsgutil.py    foosvcmsg.xsd
+    _foosvcmsg.py    foosvcmsg.py    foosvcmsgutil.py    foosvcmsg.xsd
 
-To the current directory or a specified directory the script writes two
-files: one containing the generated class definitions (`foosvcmsg.py`), and
-another containing the implementations of the `to_jsonable` and `from_jsonable`
-functions (`foosvcmsgutil.py`).
+To the current directory or a specified directory the script writes three
+files: one containing the generated class definitions (`foosvcmsg.py`), another
+containing the implementations of the `to_jsonable` and `from_jsonable`
+functions and name mappings (`foosvcmsgutil.py`), and a third containing
+implementation details that could be part of a library but are repeated for
+convenience and portability (`_foosvcmsg.py`).
 
 `stag` also accepts various options:
 
