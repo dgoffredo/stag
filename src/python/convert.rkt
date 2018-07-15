@@ -180,7 +180,8 @@
     ; Basic types get mapped to python built-ins.
     [(bdlat:basic name) (bdlat->built-in name)]))
 
-(define (element->annotation element parent-name name-map)
+(define (element->annotation 
+          element parent-name name-map #:omit-defaults [omit-defaults #f])
   ; parent-name is the bdlat name of the class that contains element.
   (match element
     [(bdlat:element name type docs default)
@@ -190,7 +191,9 @@
           py-type
           docs
           ; default value
-          (bdlat->default default py-type type name-map)))]))
+          (if omit-defaults
+            '#:omit
+            (bdlat->default default py-type type name-map))))]))
 
 (define (enumeration-value->assignment value parent-name name-map)
   ; parent-name is the bdlat name of the class that contains the enum value.
@@ -244,9 +247,10 @@
          ; body of the class
          (let ([annotations 
                 (map (lambda (element) 
-                       (element->annotation element name name-map))
+                       (element->annotation
+                         element name name-map #:omit-defaults #t))
                   elements)])
-           `(,@annotations ; attribute annotations, e.g. foo : str = 'default'
+           `(,@annotations ; attribute annotations, e.g. foo : str
              ; def __init__ ...
              ,(python-def '__init__
                ; __init__ args: self, **kwarg : typing.Union[...

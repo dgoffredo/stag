@@ -95,8 +95,8 @@ class BerEncoderOptions(gencodeutil.Sequence):
 class SomeChoice(gencodeutil.Choice):
     foo: float
     bar: datetime
-    baz: typing.List[date] = []
-    boo: typing.Optional[time] = None
+    baz: typing.List[date]
+    boo: typing.Optional[time]
 
     def __init__(self, **kwarg: typing.Union[float, datetime, typing.List[
             date], typing.Optional[time]]) -> None:
@@ -110,4 +110,4 @@ class ThisOneHasAFunnyName(gencodeutil.Sequence):
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The spiritual fishy flaky dinosaur entrances the funny spiritual agnostic coffee while the cleaver observes the jaded chipper conservative napkin."
+_code_generator_version = "The rotund sharp ecumenical programmer throws the clinical funny silly pot while the lisp assists the haggard angry brazen flower."

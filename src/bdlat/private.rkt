@@ -83,6 +83,16 @@
     [,otherwise (error
       (format "Expected a sequence/choice element but got: ~.v" node))]))
 
+(define (sxml->choice-element node)
+  (let* ([element (sxml->element node)]
+         [default (element-default element)])
+    (if (not (equal? default '#:omit))
+      (raise-user-error
+        (~a "A choice element named " (~s (~a (element-name element)))
+          " was given default value " (~s default) ", but default values "
+          "don't make any sense in a choice selection."))
+      element)))
+
 (define (split-name xml-name)
   ; Return (list namespace local-name)
   (match (string-split xml-name ":")
@@ -128,7 +138,7 @@
 
     ; choice type (recurred from complexType, above)
     [(xs:choice ,elements ...)
-     (choice type-name docs (map sxml->element elements))]
+     (choice type-name docs (map sxml->choice-element elements))]
 
     ; enumeration
     [(xs:simpleType (@ (name ,type-name)) 

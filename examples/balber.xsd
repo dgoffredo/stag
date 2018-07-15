@@ -129,6 +129,8 @@
 
   <xs:complexType name='SomeChoice'>
     <xs:choice>
+      <!-- Defaults in choices are not allowed.
+      <xs:element name='foo' type='xs:decimal' default='2.2' /> -->
       <xs:element name='foo' type='xs:decimal' />
       <xs:element name='bar' type='xs:dateTime' />
       <xs:element name='baz' type='xs:date' 
