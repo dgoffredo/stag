@@ -1,4 +1,4 @@
 #lang racket
 
-(require "options/options.rkt")
-(provide (all-from-out "options/options.rkt"))
+(require "options/private.rkt")
+(provide (all-from-out "options/private.rkt"))

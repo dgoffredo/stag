@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The tiny wild moist oven massages the moist short-sighted enthusiastic rope while the coffee pokes the angry agnostic discounted heat.")
+  "The fantastic silly chilled champion destroys the fried fishy flippant constable while the table smothers the moist white agnostic bassoon.")
