@@ -3,10 +3,10 @@
 (provide main)
 
 (require 
-  "../options/options.rkt"                       ; command line parsing
-  (only-in "../xsd-util/xsd-util.rkt" xsd->sxml) ; schema from XSD file
-  (only-in "../bdlat/bdlat.rkt" sxml->types)     ; bdlat types from schema
-  (only-in "../python/python.rkt"                ; python from bdlat types
+  "../options.rkt"                      ; command line parsing
+  (only-in "../xsd-util.rkt" xsd->sxml) ; schema from XSD file
+  (only-in "../bdlat.rkt" sxml->types)  ; bdlat types from schema
+  (only-in "../python.rkt"              ; python from bdlat types
     bdlat->python-modules render-python))
 
 (define (main argv)

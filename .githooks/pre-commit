@@ -54,7 +54,7 @@ version_content = '''#lang racket/base
   "{}")
 '''.format(random_sentence())
 
-VERSION_FILE_NAME = 'src/stag/version/version.rkt'
+VERSION_FILE_NAME = 'src/stag/version/private.rkt'
 
 with open(VERSION_FILE_NAME, 'w') as f:
     f.write(version_content)
