@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The fantastic silly chilled champion destroys the fried fishy flippant constable while the table smothers the moist white agnostic bassoon.")
+  "The flippant massive marginal butt kicks the red rotund funny coffee while the programmer telefrags the funny sorry slim lanyard.")

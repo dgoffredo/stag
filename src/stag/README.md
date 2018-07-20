@@ -1,8 +1,8 @@
 stag
 ====
 This directory is a Racket [package][package] containing modules used by the
-code generator. Each `.rkt` file in this directory is the a public module
-whose implementation, unit tests, and documentation reside in a similarly named
+code generator. Each `.rkt` file in this directory is a public module whose
+implementation, unit tests, and documentation reside in a similarly named
 subdirectory.
 
 For example, the [xsd-util.rkt](xsd-util.rkt) module provides procedures for
