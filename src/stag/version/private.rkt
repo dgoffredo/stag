@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The flippant massive marginal butt kicks the red rotund funny coffee while the programmer telefrags the funny sorry slim lanyard.")
+  "The childish second black crust rescues the fried long-winded maroon bird while the executioner clones the green spacious clinical bassoon.")

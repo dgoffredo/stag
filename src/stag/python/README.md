@@ -310,10 +310,6 @@ Implementation Modules
 The implementation of the procedures exported by [python.rkt](python.rkt)
 spans multiple modules. Each is summarized below.
 
-### python
-[python.rkt](python.rkt) is the public module that does nothing but export a
-minority of the symbols defined in the implementation.
-
 ### types
 [types.rkt](types.rkt) contains `struct` definitions representing nodes in
 python code's abstract syntax tree. For example:
