@@ -19,7 +19,7 @@
                 (split-path (path-replace-extension path ""))])
     (path->string name)))
 
-(define (parse-options [argv (current-command-line-arguments)])
+(define (parse-options argv)
   ; Return an options struct parsed from the optionally specified list of
   ; command line arguments. If parsing fails, print a diagnostic to standard
   ; error and terminate the current process with a nonzero status code.
