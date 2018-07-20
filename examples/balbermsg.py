@@ -110,4 +110,4 @@ class ThisOneHasAFunnyName(gencodeutil.Sequence):
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The rotund sharp ecumenical programmer throws the clinical funny silly pot while the lisp assists the haggard angry brazen flower."
+_code_generator_version = "The enthusiastic sorry flippant lemming renovates the happy jaded massive table while the pot chides the blue spacious fragrant gavel."

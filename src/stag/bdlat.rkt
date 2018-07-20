@@ -13,4 +13,4 @@
   (struct-out enumeration) (struct-out enumeration-value) (struct-out array)
   (struct-out nullable)    (struct-out basic))
 
-(require "private.rkt")
+(require "bdlat/private.rkt")

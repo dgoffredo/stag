@@ -2,9 +2,9 @@
 
 (provide (all-defined-out))
 
-(require (only-in sxml sxml:xpath)      ; searching in XML s-expressions
-         "../sxml-match/sxml-match.rkt" ; pattern matching SXML s-expressions
-         threading)                     ; thrush combinator macros
+(require (only-in sxml sxml:xpath) ; searching in XML s-expressions
+         "../sxml-match.rkt"       ; pattern matching SXML s-expressions
+         threading)                ; thrush combinator macros
 
 ; data types for composing BDE "attribute types"
 ; "Transparent" means fields are printed when an instance is printed,

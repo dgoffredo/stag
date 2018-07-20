@@ -2,10 +2,10 @@
 
 (provide render-python)
 
-(require "types.rkt"              ; python AST structs (what we're rendering)
-         "../version/version.rkt" ; version string for this code generator
-         threading                ; ~> and ~>> macros
-         scribble/text/wrap)      ; (wrap-line text num-chars)
+(require "types.rkt"         ; python AST structs (what we're rendering)
+         "../version.rkt"    ; version string for this code generator
+         threading           ; ~> and ~>> macros
+         scribble/text/wrap) ; (wrap-line text num-chars)
 
 (define (csv list-of-symbols indent-level indent-spaces)
   ; Return "foo, bar, baz" given '(foo bar baz). This operation is performed

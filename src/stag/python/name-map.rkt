@@ -5,9 +5,9 @@
          merge-overrides!
          capitalize-first)
 
-(require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
-         "types.rkt"                             ; python AST structs
-         threading)                              ; ~> and ~>> macros
+(require (prefix-in bdlat: "../bdlat.rkt") ; "attribute types" from SXML
+         "types.rkt"                       ; python AST structs
+         threading)                        ; ~> and ~>> macros
 
 (define (hash-value-prepend! table key value)
   ; Prepend the specified value to the list at the specified key in the

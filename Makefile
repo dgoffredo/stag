@@ -3,7 +3,7 @@ BUILD_DIR = build/$(shell uname)
 
 $(BUILD_DIR)/bin/stag: .make-init-ran-already $(shell find src/ -type f -name '*.rkt')
 	mkdir -p $(BUILD_DIR)
-	raco exe -o $(BUILD_DIR)/stag src/stag/stag.rkt
+	raco exe -o $(BUILD_DIR)/stag src/stag.rkt
 	raco distribute $(BUILD_DIR) $(BUILD_DIR)/stag
 	rm $(BUILD_DIR)/stag
 
@@ -19,4 +19,4 @@ init: .make-init-ran-already
 
 .PHONY: test
 test: init
-	raco test src/*/test.rkt
+	raco test src/stag/*/test.rkt

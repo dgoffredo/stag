@@ -2,13 +2,13 @@
 
 (provide bdlat->python-modules)
 
-(require (prefix-in bdlat: "../bdlat/bdlat.rkt") ; "attribute types" from SXML
-         "types.rkt"                             ; python AST structs
-         "name-map.rkt"                          ; schema names -> python names
-         "check-name.rkt"                        ; valid python identifiers
-         "readers.rkt"                           ; include/string macro
-         threading                               ; ~> and ~>> macros
-         srfi/1)                                 ; list procedures (e.g. any)
+(require (prefix-in bdlat: "../bdlat.rkt") ; "attribute types" from SXML
+         "types.rkt"                       ; python AST structs
+         "name-map.rkt"                    ; schema names -> python names
+         "check-name.rkt"                  ; valid python identifiers
+         "readers.rkt"                     ; include/string macro
+         threading                         ; ~> and ~>> macros
+         srfi/1)                           ; list procedures (e.g. any)
 
 (define (contains-array? bdlat-type)
   ; Return whether the specified bdlat-type contains an array; i.e. whether
