@@ -77,7 +77,7 @@ Stag requires Racket, and additionally the following Racket packages:
 
 Stag can be run from source by passing it to the Racket interpreter, e.g.
 
-    $ racket src/stag/stag.rkt --help
+    $ racket src/stag.rkt --help
 
 To compile a self-contained distribution of stag, run `make build`. This will
 create a directory `build/$(uname)` containing the `stag` binary and the
@@ -89,7 +89,7 @@ binary and its requisite libraries does not change.
 Run `make test` to run all of the `test.rkt` modules recursively under `src/`.
 You can run a test individually using `raco test`, e.g.
 
-    $ raco test src/xsd-util/test.rkt
+    $ raco test src/stag/xsd-util/test.rkt
 
 ### Name Overrides
 The `<list>` argument to the `--name-overrides` command line parameter is a
@@ -103,9 +103,9 @@ where `old-name` is either a symbol indicating the name of a class or a list
 replacement.
 
 For example, suppose that the input XSD contains a few problematic names: a
-type `BSaaS` and an attribute `MAXIMUM_LENGTH` in the type `Settings`.
-In order to map `BSaaS` to `IanaTimeZone` and to map `MAXIMUM_LENGTH`
-to `maximum_length`, the correct override list is:
+type `BSaaS` and an attribute `MAXIMUM_LENGTH` in the type `Settings`. In
+order to map `BSaaS` to `BSaas` and to map `MAXIMUM_LENGTH` to
+`maximum_length`, the correct override list is:
 
     ([BSaaS Bsaas]
      [(Settings MAXIMUM_LENGTH) maximum_length])
