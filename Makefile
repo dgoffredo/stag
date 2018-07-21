@@ -11,12 +11,11 @@ $(BUILD_DIR)/bin/stag: .make-init-ran-already $(shell find src/ -type f -name '*
 	git config core.hooksPath .githooks
 	touch .make-init-ran-already
 
-.PHONY: build
+.PHONY: build init test
+
 build: $(BUILD_DIR)/bin/stag
 
-.PHONY: init
 init: .make-init-ran-already
 
-.PHONY: test
 test: init
 	raco test --quiet --quiet-program src/stag/*/test.rkt

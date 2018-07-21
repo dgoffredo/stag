@@ -71,4 +71,4 @@ _class_by_name = {klass.__name__: klass for klass in _name_mappings}
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The childish second black crust rescues the fried long-winded maroon bird while the executioner clones the green spacious clinical bassoon."
+_code_generator_version = "The savory massive soft lemming insults the purple fuzzy slimey coffee while the stove throws the long-winded silly short-sighted crust."
