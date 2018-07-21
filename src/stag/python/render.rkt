@@ -7,16 +7,16 @@
          threading           ; ~> and ~>> macros
          scribble/text/wrap) ; (wrap-line text num-chars)
 
-(define (csv list-of-symbols indent-level indent-spaces)
-  ; Return "foo, bar, baz" given '(foo bar baz). This operation is performed
-  ; a few times within render-python. If list-of-symbols is not a list, then
-  ; just render it alone. "csv" stands for "comma separated values."
-  (if (list? list-of-symbols)
-    (~>> list-of-symbols
+(define (join items indent-level indent-spaces [separator ", "])
+  ; Return each of the specified items rendered and separated by the
+  ; optionally specified separator. If list-of-symbols is not a list, then
+  ; just render it alone.
+  (if (list? items)
+    (~>> items
          (map (lambda (form) (render-python form indent-level indent-spaces)))
-         (string-join _ ", "))
+         (string-join _ separator))
     ; otherwise
-    (render-python list-of-symbols indent-level indent-spaces)))
+    (render-python items indent-level indent-spaces)))
 
 (define (interpose sep lst)
   ; Return a list containing the elements of the specified list, but with the
@@ -142,12 +142,14 @@
   ; where each level has the specified number of space characters.
   (let* ([INDENT  (make-string (* indent-level indent-spaces) #\space)]
          ; Recurse into this procedure, preserving auxiliary arguments.
-         [recur   (lambda (form [indent-level indent-level])
-                    (render-python form indent-level indent-spaces))]
+         [recur (lambda (form [indent-level indent-level])
+                  (render-python form indent-level indent-spaces))]
          ; Recurse into this procedure with indent-level incremented.
-         [recur+1 (lambda (form) (recur form (+ indent-level 1)))]
-         ; Bind indent-level and indent-spaces to csv. Note the shadowing.
-         [csv     (lambda (form) (csv form indent-level indent-spaces))])
+         [recur+1 (lambda (form) 
+                    (recur form (+ indent-level 1)))]
+         ; Bind indent-level and indent-spaces to join. Note the shadowing.
+         [join (lambda (form . args) 
+                 (apply join `(,form ,indent-level ,indent-spaces . ,args)))])
     (match form
       [(python-module description docs imports statements)
        ; """This is the description.
@@ -189,22 +191,23 @@
        ; or
        ;     from something import thing1
        ;     from something import thing2
-       (cond
-         [(null? names)
-           (~a INDENT "import " from-module "\n")]
-         [(not (list? names))
-           (~a INDENT "from " from-module " import " names "\n")]
-         [else
-           (string-join 
-             (map
-               (lambda (name)
-                 (~a INDENT "from " from-module " import " name))
-               names)
-             "\n")])]
+       (let ([from-module (join from-module ".")])
+         (cond
+           [(null? names)
+             (~a INDENT "import " from-module "\n")]
+           [(not (list? names))
+             (~a INDENT "from " from-module " import " names "\n")]
+           [else
+             (string-join 
+               (map
+                 (lambda (name)
+                   (~a INDENT "from " from-module " import " name))
+                 names)
+               "\n")]))]
 
       [(python-import-alias module-name alias)
        ; import something as somethingelse
-       (~a "import " module-name " as " alias "\n")]
+       (~a "import " (join module-name ".") " as " alias "\n")]
 
       [(python-class name bases docs statements)
        ; class Name(Base1, Base2):
@@ -213,7 +216,7 @@
        ;     """
        ;     ...
        (~a INDENT "class " name
-         (let ([bases-text (csv bases)])
+         (let ([bases-text (join bases)])
            (if (= (string-length bases-text) 0)
              ""
              (~a "(" bases-text ")")))
@@ -257,7 +260,7 @@
       [(python-def name args type docs body)
        ; def name(arg1, arg2):
        ;     body...
-       (~a INDENT "def " name "(" (csv args) ")"
+       (~a INDENT "def " name "(" (join args) ")"
          (if (equal? type '#:omit) 
            "" 
            (~a " -> " (format-type type indent-level indent-spaces))) ":\n"
@@ -268,7 +271,7 @@
          "\n")]
 
       [(python-invoke name args)
-       (~a INDENT name "(" (csv args) ")")]
+       (~a INDENT name "(" (join args) ")")]
 
       [(python-dict items)
        ; {key1: value1, ...}
@@ -286,12 +289,12 @@
        (~a INDENT "return " (recur expression))]
 
       [(python-for variables iterator body)
-       (~a INDENT "for " (csv variables) " in " (recur iterator) ":\n"
+       (~a INDENT "for " (join variables) " in " (recur iterator) ":\n"
          (string-join (map recur+1 body) ""))]
 
       [(python-dict-comprehension key value variables iterator)
        (~a "{" (recur key) ": " (recur value)
-         " for " (csv variables) " in " (recur iterator)
+         " for " (join variables) " in " (recur iterator)
          "}")]
 
       [(? symbol? value)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Pass the name of the library whose types to generate, e.g. "balber".
-library="${1:-balber}"
+# Pass the name of the library whose types to generate.
+library="$1"
 
 # Pop that library name off of the arguments, if it was specified at all. This
 # is so the remaining arguments can be forwarded to the code generator.
@@ -19,6 +19,18 @@ run_checked() {
         exit $rcode
     fi
 }
+
+# Without any arguments, run this script on all libraries in this script's
+# directory.
+if [ -z "$library" ]; then
+    for schema in $(dirname $0)/*.xsd; do
+        without_extension="${schema%.*}"
+        lib="$(basename $without_extension)"
+        # Call this script again, specifying the library that we found.
+        run_checked "$0" "$lib" "$@"
+    done
+    exit 0
+fi
 
 # Deduce where the stag root is based on where this script is assumed to be.
 REPO=$(readlink -f $(dirname $BASH_SOURCE)/../)

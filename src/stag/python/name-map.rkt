@@ -59,6 +59,8 @@
   ;         })
   ;         ...
   ;     }
+  ;
+  ; types-module-name must be a single symbol.
   (python-dict
     (for/list ([(key pairs) (name-map-by-class name-map)])
       (cons

@@ -6,6 +6,7 @@
          "types.rkt"                       ; python AST structs
          "name-map.rkt"                    ; schema names -> python names
          "check-name.rkt"                  ; valid python identifiers
+         "list-util.rkt"                   ; list<?
          "../readers.rkt"                  ; include/string macro
          threading                         ; ~> and ~>> macros
          srfi/1)                           ; list procedures (e.g. any)
@@ -50,7 +51,7 @@
         [(bdlat:array type)            (recur type)]
         [(bdlat:basic type)            (equal? type matching-case)]
         [_                             #f])))
-
+    
 (define (bdlat->imports types private-module-name)
   ; Deduce from the specified bdlat types which python modules a module
   ; defining those types must import.
@@ -75,8 +76,7 @@
   (define imports
     (set-union
       (set 
-        (python-import-alias (string->symbol private-module-name)
-                             'gencodeutil))
+        (python-import-alias private-module-name 'gencodeutil))
       (maybe-import (lambda (type) (contains-basic-type? type "date"))
         '(datetime date))
       (maybe-import (lambda (type) (contains-basic-type? type "time"))
@@ -94,9 +94,7 @@
   ; PEP8 conformant, but what a pain that would be.
   (~> imports 
       set->list 
-      (sort symbol<? 
-        #:key (match-lambda [(python-import from _) from]
-                            [(python-import-alias from _) from]))))
+      (sort (list<? symbol<?) #:key get-module-name)))
 
 (define *default-types-module-description*
   "Provide typed attribute classes.")
@@ -312,9 +310,8 @@
     ; documentation
     '() ; TODO: usage examples
     ; imports
-    (list (python-import (string->symbol types-module-name) '())
-          (python-import-alias 
-            (string->symbol private-module-name) 'gencodeutil)
+    (list (python-import-alias types-module-name 'types)
+          (python-import-alias private-module-name 'gencodeutil)
           (python-import 'typing '()))
     ; statements (body)
     (list
@@ -353,9 +350,9 @@
             '(return_type obj _name_mappings _class_by_name)))))
       ; _name_mappings = { ...
       (python-assignment
-        '_name_mappings                                    ; lhs
-        (name-map->python-dict name-map types-module-name) ; rhs
-        '())                                               ; docs
+        '_name_mappings                         ; lhs
+        (name-map->python-dict name-map 'types) ; rhs
+        '())                                    ; docs
       ; _class_by_name = { klass.__name__: klass for klass in _name_mappings }
       (python-assignment
         '_class_by_name            ; lhs
@@ -369,16 +366,37 @@
 (define (private-module)
   (python-rendered-module (include/string "gencodeutil.py")))
 
+(define (split-module-name module-name)
+  ; From the specified string, return a list of symbols, each of which is
+  ; suitable as part of the module name in a python import, e.g. "foo.bar.baz"
+  ; would yield '(foo bar baz), which as part of a python-import would render
+  ; as "import foo.bar.baz". Raise a user error if any of the parts of the
+  ; module name is an invalid python identifier.
+  (~> module-name (string-split ".") check-module-name (map string->symbol _)))
+
+(define (build-name-map types overrides)
+  ; Return a hash table that maps the bdlat (schema) names of the specified
+  ; types and their elements to python class and attribute names. Use the
+  ; specified list of overrides to override python names that are otherwise
+  ; calculated. Raise a user error if any of the resulting python names are
+  ; invalid identifiers.
+  (~> types bdlat->name-map (merge-overrides! overrides) check-name-map))
+
 (define (bdlat->python-modules
-          types
-          types-module-name
-          private-module-name
-          #:overrides [overrides '()]
+          types                        ; list of type struct, e.g. bdlat:choice
+          types-module-name            ; e.g. "foo" or "a.b.foo"
+          private-module-name          ; e.g. "_foo" or "a.b._foo"
+          #:overrides [overrides '()]  ; see toplevel README.md
           #:description [description *default-types-module-description*]
           #:docs [docs *default-types-module-docs*])
-  (let ([name-map 
-         (~> types 
-           bdlat->name-map (merge-overrides! overrides) check-name-map)])
+  ; Return a list of three python module ASTs created using the specified
+  ; arguments. The first module contains python classes deduced from the
+  ; specified types. The second module contains encoding and decoding
+  ; functions for the generated types. The third "private" module contains
+  ; generic types and functions used by the other two modules.
+  (let ([name-map (build-name-map types overrides)]
+        [types-module-name (split-module-name types-module-name)]
+        [private-module-name (split-module-name private-module-name)])
     (list
       ; the types module
       (bdlat->types-module

@@ -1,7 +1,7 @@
-"""Provide codecs for types defined in scratchmsg.
+"""Provide codecs for types defined in (scratchmsg).
 
 """
-import scratchmsg
+import scratchmsg as types
 import _scratchmsg as gencodeutil
 import typing
 
@@ -24,12 +24,12 @@ def from_jsonable(return_type: typing.Any, obj: typing.Any) -> typing.Any:
 
 
 _name_mappings = {
-    scratchmsg.SomeChoice:
+    types.SomeChoice:
     gencodeutil.NameMapping({
         "foo": "foo",
         "bar": "bar"
     }),
-    scratchmsg.Color:
+    types.Color:
     gencodeutil.NameMapping({
         "RED": "RED",
         "BLUE": "BLUE",
@@ -42,4 +42,4 @@ _class_by_name = {klass.__name__: klass for klass in _name_mappings}
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The rotund sharp ecumenical programmer throws the clinical funny silly pot while the lisp assists the haggard angry brazen flower."
+_code_generator_version = "The funny gritty spiritual food educates the flippant jaded sorry cabinet while the table filibusters the harsh discounted angry constellation."

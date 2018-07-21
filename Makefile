@@ -1,7 +1,10 @@
 
 BUILD_DIR = build/$(shell uname)
 
-$(BUILD_DIR)/bin/stag: .make-init-ran-already $(shell find src/ -type f -name '*.rkt')
+$(BUILD_DIR)/bin/stag: \
+.make-init-ran-already \
+$(shell find src/ -type f -name '*.rkt') \
+README.md
 	mkdir -p $(BUILD_DIR)
 	raco exe -o $(BUILD_DIR)/stag src/stag.rkt
 	raco distribute $(BUILD_DIR) $(BUILD_DIR)/stag

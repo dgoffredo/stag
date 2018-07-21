@@ -14,12 +14,12 @@
   #:transparent)
 
 (struct python-import
-  (from-module ; symbol
+  (from-module ; symbol or list of symbols (for foo.bar.baz)
    symbols)    ; a list of symbols or a single symbol
   #:transparent)
 
 (struct python-import-alias
-  (module-name ; symbol
+  (module-name ; symbol or list of symbols (for foo.bar.baz)
    alias)      ; symbol
   #:transparent)
 
@@ -95,3 +95,11 @@
   (match annotation
     [(python-annotation attribute type docs default)
      (python-argument   attribute type      default)]))
+
+(define (get-module-name import-struct)
+  ; Return the module name within the specified import-struct, which is either
+  ; a python-import or a python-import alias. Note that a module name is either
+  ; a symbol or a list of symbols.
+  (match import-struct 
+    [(python-import from _)       from]
+    [(python-import-alias from _) from]))

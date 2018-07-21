@@ -347,6 +347,11 @@ definitions (such as `sequence` and `choice`) into python AST objects (such
 as `python-class`). This module determines which python code constructs are
 produced by the generator.
 
+### list-util
+[list-util.rkt](list-util.rkt) contains procedures that are shamefully missing
+from the standard library. Admittedly, SRFI 67 defines lexicographic
+comparisons, but they're a pain to use.
+
 ### render
 [render.rkt](render.rkt) contains the procedure `render-python`, which takes
 a python AST object (such as `python-module`) and produces a string

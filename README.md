@@ -39,7 +39,7 @@ How
 ---
 Invoke `stag` as a command line tool:
 
-    $ ./stag foosvcmsg.xsd
+    $ stag foosvcmsg.xsd
     $ ls
     _foosvcmsg.py    foosvcmsg.py    foosvcmsgutil.py    foosvcmsg.xsd
 
@@ -59,6 +59,7 @@ convenience and portability (`_foosvcmsg.py`).
 | `--types-module <name>`       | name of module containing types             |
 | `--util-module <name>`        | name of module containing utilities         |
 | `--private-module <name>`     | name of module containing private details   |
+| `--package <name>`            | package path containing generated modules   |
 | `--extensions-namespace <ns>` | XML namespace where extensions are defined  |
 | `--name-overrides <list>`     | generated identifiers. See "Name Overrides."|
 
@@ -88,7 +89,7 @@ binary and its requisite libraries does not change.
 Run `make test` to run all of the `test.rkt` modules recursively under `src/`.
 You can run a test individually using `raco test`, e.g.
 
-    raco test src/xsd-util/test.rkt
+    $ raco test src/xsd-util/test.rkt
 
 ### Name Overrides
 The `<list>` argument to the `--name-overrides` command line parameter is a
@@ -111,4 +112,36 @@ to `maximum_length`, the correct override list is:
 
 which can be passed on the command line as:
 
-    ./stag --name-overrides '([BSaaS Bsaas] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd
+    $ stag --name-overrides '([BSaaS Bsaas] [(Settings MAXIMUM_LENGTH) maximum_length])' schema.xsd
+
+### Packages
+The `--package` command line argument allows the generated python modules to
+reside in a python package (or a sub-package, or a sub-sub-package, etc.).
+
+If
+`--package` is not specified, then modules are written to the
+`--output-directory` (which defaults to the current directory).
+
+If `--package` is specified, then its argument must be a period-separated
+package name, such as "configs.balber" or "services" or "atp.dna.foostuff".
+Modules will be written as leaves to a directory tree rooted at the
+`--output-directory` but otherwise following the structure of `--package`. For
+example,
+
+    $ stag --output-directory /home/ksozer --package svc.namesvc namesvc.xsd
+
+would leave the following directory tree, creating directories if necessary:
+
+    /home/ksozer/
+                 svc/
+                     __init__.py
+                     namesvc/
+                             __init__.py
+                             _namesvcmsg.py
+                             namesvcmsg.py
+                             namesvcmsgutil.py
+
+The `__init__.py` files are added empty if they're not present already.
+
+Note that if directories are created by stag, but then stag fails before
+completing code generation, the created directories will remain.

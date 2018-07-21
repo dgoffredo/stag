@@ -1,6 +1,7 @@
 #lang racket
 
 (provide check-name-map
+         check-module-name
          check-name
          invalid-python-identifier?)
 
@@ -95,6 +96,22 @@
   ; Quote the specified text in double quotes and escape characters necessary
   ; to prevent Unix shell expansion within the resulting string.
   (~a "\"" (string-replace text "$" "\\$") "\"")) 
+
+(define (check-module-name parts)
+  ; Return the specified parts of a module name (e.g. "foo" in "import
+  ; foo.bar") if each is a valid python identifier, where parts is a list of
+  ; strings. If any is not a valid python identifier, raise a user error
+  ; describing what is wrong with the part.
+  (for/list ([part parts])
+    (let ([invalid-why (invalid-python-identifier? part)])
+      (if invalid-why
+        (raise-user-error
+          (~a "An invalid python identifier was encountered. " invalid-why
+            " " (~s part) " is part of the module name "
+            (~s (string-join parts "."))))
+        ; Otherwise, the part is valid, so just return it.
+        part))))
+
 
 (define (check-name name schema-name [parent-name #f])
   ; Return the specified string (name) if it is a valid python identifier. If
