@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The savory massive soft lemming insults the purple fuzzy slimey coffee while the stove throws the long-winded silly short-sighted crust.")
+  "The wild tiny happy food kicks the big-boned slimey bruised rope while the author ignores the happy conservative spiritual consternation.")

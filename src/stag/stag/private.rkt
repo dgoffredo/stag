@@ -16,6 +16,7 @@
         types-module 
         util-module 
         private-module
+        package
         extensions-namespace 
         name-overrides 
         output-directory 

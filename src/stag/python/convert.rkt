@@ -6,7 +6,7 @@
          "types.rkt"                       ; python AST structs
          "name-map.rkt"                    ; schema names -> python names
          "check-name.rkt"                  ; valid python identifiers
-         "readers.rkt"                     ; include/string macro
+         "../readers.rkt"                  ; include/string macro
          threading                         ; ~> and ~>> macros
          srfi/1)                           ; list procedures (e.g. any)
 

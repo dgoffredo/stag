@@ -3,10 +3,13 @@
 (provide (struct-out options) ; struct containing parsed command line options
          parse-options)       ; procedure that parses command line options
 
+(require "../readers.rkt") ; include/string
+
 (struct options (verbose              ; #t -> print verbose diagnostics
                  types-module         ; e.g. "foosvcmsg"
                  util-module          ; e.g. "foosvcmsgutil"
                  private-module       ; e.g. "_foosvcmsg"
+                 package              ; e.g. "services.usersvc", or #f for none
                  extensions-namespace ; e.g. for <element>'s "id" attribute
                  name-overrides       ; e.g. ([before after] ...)
                  output-directory     ; path to directory for output files
@@ -27,6 +30,7 @@
   (define types-module (make-parameter #f))
   (define util-module  (make-parameter #f))
   (define private-module  (make-parameter #f))
+  (define package (make-parameter #f))
   (define extensions-namespace 
     (make-parameter "http://bloomberg.com/schemas/bdem"))
   (define name-overrides (make-parameter '()))
@@ -36,7 +40,10 @@
     (command-line
       #:argv argv
       #:once-each
-      [("--verbose") "Emit verbose diagnostics"
+      [("--readme") "Print README.md to standard output"
+                    (displayln (include/string "../../../README.md"))
+                    (exit)]
+      [("--verbose") "Emit verbose diagnostics" ; TODO
                       (verbose #t)]
       [("--types-module") TYPES-MODULE
                           "Set the name of the types module"
@@ -47,6 +54,9 @@
       [("--private-module") PRIVATE-MODULE
                           "Set the name of the private module"
                           (private-module PRIVATE-MODULE)]
+      [("--package") PACKAGE
+                     "Set the name of the output package"
+                     (package PACKAGE)]
       [("--extensions-namespace") EXTENSIONS-NAMESPACE
                                   "Set XSD extensions XML namespace"
                                   (extensions-namespace EXTENSIONS-NAMESPACE)]
@@ -79,6 +89,7 @@
            types-module*
            util-module*
            private-module*
+           (package)
            (extensions-namespace)
            (name-overrides)
            (output-directory)

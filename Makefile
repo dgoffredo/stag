@@ -19,4 +19,4 @@ init: .make-init-ran-already
 
 .PHONY: test
 test: init
-	raco test src/stag/*/test.rkt
+	raco test --quiet --quiet-program src/stag/*/test.rkt

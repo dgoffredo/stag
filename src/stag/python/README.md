@@ -352,12 +352,6 @@ produced by the generator.
 a python AST object (such as `python-module`) and produces a string
 containing python source code suitable for use in a `python3.6` interpreter.
 
-### readers
-[readers.rkt](readers.rkt) provides the `include/string` macro, which takes
-a path to a file and expands to a string containing the contents of that
-file. This is used to include python code verbatim in the output of the code
-generator (currently for the "private" python module)
-
 ### gencodeutil
 [gencodeutil.py](gencodeutil.py) and its unit test
 [test_gencodeutil.py](test_gencodeutil.py) are a python module that is included
