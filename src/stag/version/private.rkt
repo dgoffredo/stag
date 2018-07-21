@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The slimey dull red battery burns the massive sharp curious heat while the manager chides the savory slim spacious rum.")
+  "The spacious agnostic brisk butt kicks the fishy black red friar while the battery incinerates the black happy ecumenical badger.")
