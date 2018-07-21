@@ -3,7 +3,7 @@
 (provide (struct-out options) ; struct containing parsed command line options
          parse-options)       ; procedure that parses command line options
 
-(require "../readers.rkt") ; include/string
+(require "readme.rkt") ; (display-readme)
 
 (struct options (verbose              ; #t -> print verbose diagnostics
                  types-module         ; e.g. "foosvcmsg"
@@ -35,13 +35,13 @@
     (make-parameter "http://bloomberg.com/schemas/bdem"))
   (define name-overrides (make-parameter '()))
   (define output-directory (make-parameter (string->path "./")))
-  
+
   (define schema-path-string
     (command-line
       #:argv argv
       #:once-each
       [("--readme") "Print README.md to standard output"
-                    (displayln (include/string "../../../README.md"))
+                    (display-readme)
                     (exit)]
       [("--verbose") "Emit verbose diagnostics" ; TODO
                       (verbose #t)]
