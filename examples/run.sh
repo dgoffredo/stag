@@ -37,7 +37,7 @@ REPO=$(readlink -f $(dirname $BASH_SOURCE)/../)
 
 # Go into the examples/ directory and run stag on the schema. 
 run_checked cd $REPO/examples
-run_checked racket $REPO/src/stag.rkt "$@" $library.xsd
+run_checked racket $REPO/src/stag/main.rkt "$@" $library.xsd
 
 # Stag will have produced these three python modules.
 FILES="${library}msg.py ${library}msgutil.py _${library}msg.py"

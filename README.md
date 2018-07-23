@@ -77,7 +77,7 @@ Stag requires Racket, and additionally the following Racket packages:
 
 Stag can be run from source by passing it to the Racket interpreter, e.g.
 
-    $ racket src/stag.rkt --help
+    $ racket src/stag/main.rkt --help
 
 To compile a self-contained distribution of stag, run `make build`. This will
 create a directory `build/$(uname)` containing the `stag` binary and the
@@ -90,6 +90,16 @@ Run `make test` to run all of the `test.rkt` modules recursively under `src/`.
 You can run a test individually using `raco test`, e.g.
 
     $ raco test src/stag/xsd-util/test.rkt
+
+### `raco stag`
+If stag has been installed as a Racket package:
+
+    $ cd src/stag
+    $ raco pkg install
+
+then it can be run as a `raco` command:
+
+    $ raco stag --help
 
 ### Name Overrides
 The `<list>` argument to the `--name-overrides` command line parameter is a

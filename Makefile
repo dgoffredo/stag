@@ -5,7 +5,7 @@ SOURCES = $(shell find src/ -type f -name '*.rkt') README.md
 # Create a self-contained distribution of the stag command line tool.
 $(BUILD_DIR)/bin/stag: $(SOURCES) .make-init-ran-already
 	mkdir -p $(BUILD_DIR)
-	raco exe -o $(BUILD_DIR)/stag src/stag.rkt
+	raco exe -o $(BUILD_DIR)/stag src/stag/main.rkt
 	raco distribute $(BUILD_DIR) $(BUILD_DIR)/stag
 	rm $(BUILD_DIR)/stag
 
@@ -14,7 +14,7 @@ $(BUILD_DIR)/bin/stag: $(SOURCES) .make-init-ran-already
 	git config core.hooksPath .githooks
 	touch .make-init-ran-already
 
-.PHONY: build init test package
+.PHONY: build init test package examples
 
 # Create a self-contained distribution of the stag command line tool.
 build: $(BUILD_DIR)/bin/stag
@@ -30,3 +30,7 @@ test: init
 package: $(SOURCES)
 	2>/dev/null raco pkg remove stag
 	cd src/stag && raco pkg install
+
+# Generate examples
+examples:
+	examples/run.sh

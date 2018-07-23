@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The spacious agnostic brisk butt kicks the fishy black red friar while the battery incinerates the black happy ecumenical badger.")
+  "The bruised haggard agnostic friar melts the ecumenical red big-boned crab while the tree paints the massive spacious chilled moon.")
