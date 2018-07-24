@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The bruised haggard agnostic friar melts the ecumenical red big-boned crab while the tree paints the massive spacious chilled moon.")
+  "The fishy big-boned clinical treasure throws the jaded slimey wild gavel while the ice throws the angry fuzzy ecumenical manager.")
