@@ -65,6 +65,8 @@ convenience and portability (`_foosvcmsg.py`).
 
 More
 ----
+Generally, see `make help`. More detailed information follows.
+
 ### Repository Initialization
 Run `make init` after cloning this repository. It sets up `git` pre-commit
 hook that keeps `version.rkt` up to date. See 

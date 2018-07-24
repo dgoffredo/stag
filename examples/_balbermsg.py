@@ -274,4 +274,4 @@ def from_jsonable(return_type: Any, obj: Any,
 # This is the version string identifying the version of stag that generated
 # this code. Search through the code generator's git repository history for
 # this string to find the commit of the contemporary code generator.
-_code_generator_version = "The spacious agnostic brisk butt kicks the fishy black red friar while the battery incinerates the black happy ecumenical badger."
+_code_generator_version = "The fishy big-boned clinical treasure throws the jaded slimey wild gavel while the ice throws the angry fuzzy ecumenical manager."
