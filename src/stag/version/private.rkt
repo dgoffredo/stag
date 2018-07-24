@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The spacious gritty marginal duck hypnotizes the enthusiastic blue sharp plank while the table fries the happy savory discounted lanyard.")
+  "The enthusiastic agnostic short-sighted champion ignores the marginal second maroon consternation while the treasure supports the black excessive childish galaxy.")

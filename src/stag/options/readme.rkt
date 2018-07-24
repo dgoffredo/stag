@@ -27,6 +27,8 @@
     (displayln form port)))
 
 (define ascii-stag
+  ; This ASCII picture was signed "valkyrie" when I copied it from
+  ; http://www.chris.com/ascii/index.php?art=animals/deer on July 21, 2018.
 #<<END
      /|       |\
   `__\\       //__'
