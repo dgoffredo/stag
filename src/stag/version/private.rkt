@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The fishy big-boned clinical treasure throws the jaded slimey wild gavel while the ice throws the angry fuzzy ecumenical manager.")
+  "The red soaked funny asphalt educates the sorry marginal long-winded apple while the beaver pokes the fantastic short-sighted happy battery.")

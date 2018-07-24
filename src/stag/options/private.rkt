@@ -38,6 +38,7 @@
 
   (define schema-path-string
     (command-line
+      #:program "stag"
       #:argv argv
       #:once-each
       [("--readme") "Print README.md to standard output"
