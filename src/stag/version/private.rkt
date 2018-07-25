@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The funny discounted spacious cleaver supports the fragrant happy friendly badger while the heat ignores the tiny angry slimey food.")
+  "The malignant black happy pencil chides the long-winded slippery big-boned lemming while the consternation insults the flippant savory silly rant.")

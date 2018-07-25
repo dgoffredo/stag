@@ -18,7 +18,7 @@
   (match-type-class bdlat-type contains-array? bdlat:array bdlat:nullable))
 
 (define (contains-nullable? bdlat-type)
-  ; Return whether the specified bdlat-type contains an nullable; i.e. whether
+  ; Return whether the specified bdlat-type contains a nullable; i.e. whether
   ; it's either a sequence with an nullable-typed element or a choice with an
   ; nullable-typed element.
   (match-type-class bdlat-type contains-nullable? bdlat:nullable bdlat:array))
