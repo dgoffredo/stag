@@ -7,8 +7,8 @@ bdlat types.
 Contents
 --------
 
-The [python](python.rkt) module exports various `struct`s representing nodes in
-python's abstract syntax tree, and also two procedures:
+The [python](../python.rkt) module exports various `struct`s representing
+nodes in python's abstract syntax tree, and also two procedures:
 
 The first procedure, `bdlat->python-modules`, takes a list of type
 definitions from the `bdlat` module, such as `bdlat-sequence` and
@@ -22,7 +22,7 @@ object contains the definitions of base classes and functions used by any
 generated code, but is included separately to avoid the administration problem
 that could be caused by dependency on a generator-specific python library.
 
-The other procedure exported by [python.rkt](python.rkt) is `render-python`.
+The other procedure exported by [python.rkt](../python.rkt) is `render-python`.
 `render-python` takes an instance of any of the `python-`-prefixed `struct`s
 and returns a string of python code rendered from that instance.
 

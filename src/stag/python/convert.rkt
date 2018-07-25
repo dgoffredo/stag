@@ -101,10 +101,10 @@
 
 (define *default-types-module-docs*
   `("This module provides typed attribute classes generated from a schema."
-    ,(string-join '("Instances of the types defined in this module are "
-                    "immutable, and may be converted to and from "
-                    "JSON-compatible objects using the similarly-named "
-                    "utilities module that is dual to this module.") "")))
+    ,(string-join '("Instances of the types defined in this module are"
+                    "mutable, and may be converted to and from JSON-compatible"
+                    "objects using the similarly-named utilities module that"
+                    "is dual to this module.") " ")))
 
 (define (bdlat->default default py-type bdlat-type name-map)
   (if (equal? default '#:omit)
