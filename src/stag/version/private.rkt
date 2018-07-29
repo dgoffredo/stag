@@ -3,4 +3,4 @@
 (provide *stag-version*)
 
 (define *stag-version*
-  "The malignant black happy pencil chides the long-winded slippery big-boned lemming while the consternation insults the flippant savory silly rant.")
+  "The white fried rotund staple insults the new funny flippant horse while the crust obstructs the long-winded tiny blue flower.")

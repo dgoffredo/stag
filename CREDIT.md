@@ -5,7 +5,7 @@ by the copyright holder.
 
 Code
 ----
-The [sxml-match](src/sxml-match) module was written by Jim Bender, and is
+The [sxml-match](src/stag/sxml-match) module was written by Jim Bender, and is
 released under the same license as stag (the MIT License).
 
 The `make help` target defined in the [Makefile](Makefile) was copied from

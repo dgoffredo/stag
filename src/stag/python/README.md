@@ -28,7 +28,7 @@ and returns a string of python code rendered from that instance.
 
 The Idea
 --------
-For a real usage example, see [stag.rkt](../stag/stag.rkt).
+For a real usage example, see [stag](../stag/private.rkt).
 
 As an example of the transformations involved in code generation, this
 module can be used to transform the following list of bdlat types:
@@ -307,7 +307,7 @@ _name_mappings = {
 
 Implementation Modules
 ----------------------
-The implementation of the procedures exported by [python.rkt](python.rkt)
+The implementation of the procedures exported by [python.rkt](../python.rkt)
 spans multiple modules. Each is summarized below.
 
 ### types

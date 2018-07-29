@@ -12,7 +12,7 @@ $(BUILD_DIR)/bin/stag: $(SOURCES) .make-init-ran-already
 	git config core.hooksPath .githooks
 	touch .make-init-ran-already
 
-.PHONY: build init test package examples
+.PHONY: build init test package examples clean
 
 ## Create self-contained distribution
 build: $(BUILD_DIR)/bin/stag
@@ -32,6 +32,13 @@ package: $(SOURCES)
 ## Generate examples
 examples:
 	examples/run.sh
+
+## Remove build and all build/run artifacts
+clean:
+	if [ -d build ]; then rm -r build; fi
+	find . -type d -name 'compiled'    -exec rm -r {} +
+	find . -type d -name '__pycache__' -exec rm -r {} +
+	find . -type d -name '.mypy_cache' -exec rm -r {} +
 
 # The "help" target and its associated code was copied from crifan's
 # December 7, 2017 comment on <https://gist.github.com/prwhite/8168133>,
