@@ -25,8 +25,6 @@ class Sequence:
         attr_set: Set[str] = set()
         setattr(cls, '__required', attr_set)
         for key, value in cls.__annotations__.items():
-            if isinstance(value, str):
-                raise TypeError('Invalid annotation: {}'.format(key))
             type_str = str(value)
             if type_str.startswith('typing.Union') and \
                     type(None) not in value.__args__ and \
@@ -35,7 +33,7 @@ class Sequence:
             elif not type_str.startswith('typing.List') and \
                     not type_str.startswith('typing.Optional') and \
                     not hasattr(cls, key):
-                    attr_set.add(key)
+                attr_set.add(key)
 
     def __init__(self, **kwargs: Any) -> None:
         for req in self.__required:
