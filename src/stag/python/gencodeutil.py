@@ -5,7 +5,8 @@ classes.
 '''
 
 from enum import Enum
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Set, Tuple, \
+    Type, Union
 
 import decimal
 import datetime
@@ -17,7 +18,29 @@ class Sequence:
     subscripting, and an initializer that just assigns attributes.
     """
 
+    __required: Set[str]
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__()
+        attr_set: Set[str] = set()
+        setattr(cls, '__required', attr_set)
+        for key, value in cls.__annotations__.items():
+            if isinstance(value, str):
+                raise TypeError('Invalid annotation: {}'.format(key))
+            type_str = str(value)
+            if type_str.startswith('typing.Union') and \
+                    type(None) not in value.__args__ and \
+                    not hasattr(cls, key):
+                attr_set.add(key)
+            elif not type_str.startswith('typing.List') and \
+                    not type_str.startswith('typing.Optional') and \
+                    not hasattr(cls, key):
+                    attr_set.add(key)
+
     def __init__(self, **kwargs: Any) -> None:
+        for req in self.__required:
+            if req not in kwargs:
+                raise KeyError(f'Required attribute "{req}" missing')
         for attr, value in kwargs.items():
             setattr(self, attr, value)
 
