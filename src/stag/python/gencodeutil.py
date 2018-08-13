@@ -39,6 +39,12 @@ class Sequence:
         for req in self.__required:
             if req not in kwargs:
                 raise KeyError(f'Required attribute "{req}" missing')
+        # copy list defaults
+        for attr in self.__annotations__.keys():
+            if hasattr(self, attr):
+                value = getattr(self, attr)
+                if isinstance(value, List):
+                    setattr(self, attr, list(value))
         for attr, value in kwargs.items():
             setattr(self, attr, value)
 
